@@ -1,7 +1,7 @@
 ## ---------- ##
 ## Containers ##
 ## ---------- ##
-r_container: "docker://rtpop/crc_multiomics:0.1"
+r_container: "docker://rtpop/process_cel:0.1"
 
 ## Number of cores
 ncores: 30
@@ -29,7 +29,8 @@ metadata_file: "all_primary_samples.csv"
 # in case different batches of files need different processing (i.e. different batch correction, etc)
 # options: "all", "multi_region", "single_region"
 
-file_selection_method: "multi_region" 
+file_selection_method: "multi_region"
+normal_samples: false
 batch_metadata_column: "Batch_by_lot"
 background_correction: "rma"
 normalization_method: "quantile"

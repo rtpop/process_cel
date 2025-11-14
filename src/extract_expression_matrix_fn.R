@@ -23,6 +23,16 @@ extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, norm
     fwrite(as.data.frame(anno), file = output_file, sep = "\t", row.names = TRUE)
 }
 
+
+#' @name annotate_expression_matrix
+#' @title Annotate expression matrix with gene names and Ensembl IDs
+#' @description This function annotates the expression matrix with gene names and Ensembl IDs using biomaRt.
+#' @param expression_matrix A numeric matrix of expression values with probe IDs as row names and sample IDs as column names.
+#' @param files_metadata A data frame containing metadata for the samples, including tumour IDs and CEL file names.
+#' @param array_type A character string specifying the type of array (e.g., "HTA20" or "HUEX10").
+#' @return A data frame with the annotated expression matrix, including gene names and Ensembl IDs.
+
+
 annotate_expression_matrix <- function(expression_matrix, files_metadata, array_type) {
     array_type <- tolower(array_type)
     if (array_type == "hta20") {
@@ -49,5 +59,7 @@ annotate_expression_matrix <- function(expression_matrix, files_metadata, array_
     annotated_exp <- as.data.frame(expression_matrix)
     annotated_exp$gene_name <- annotations$hgnc_symbol[match(rownames(expression_matrix), annotations$affy_hta_2_0)]
     annotated_exp$ensembl_id <- annotations$ensembl_gene_id[match(rownames(expression_matrix), annotations$affy_hta_2_0)]
+
+    return(annotated_exp)
 }
 

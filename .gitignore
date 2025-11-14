@@ -2,3 +2,6 @@
 data/
 logs/
 output/
+.cache/
+*.tmp
+*.log

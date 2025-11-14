@@ -45,3 +45,4 @@ normalization_method: "quantile" # method for normalization
 exp_file_unnormalised: "multi_region_exp_unnormalised.txt"
 exp_file_batch_corrected: "multi_region_exp_batch_corrected.txt"
 exp_file_final: "multi_region_exp_final.txt"
+annotation_file: "hta20_annotation.txt"

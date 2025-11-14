@@ -61,6 +61,7 @@ METADATA_FILE = os.path.join(DATA_DIR, config["metadata_file"])
 RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, "files_to_process.txt")
 
 EXP_FILE_UNNORMALISED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_unnormalised"])
+ANNO_FILE = os.path.join(PROCESSED_DATA_DIR, config["annotation_file"])
 
 
 ## Params
@@ -111,7 +112,8 @@ rule extract_expression_matrix:
         script = os.path.join(SRC_DIR, "extract_expression_matrix.R"), \
         normalise = NORMALISE, \
         background_correction = BACKGROUND_CORRECTION, \
-        array_type = ARRAY_TYPE
+        array_type = ARRAY_TYPE, \
+        anno_file = ANNO_FILE
     shell:
         """
         Rscript {params.script} \
@@ -120,5 +122,6 @@ rule extract_expression_matrix:
             --normalise {params.normalise} \
             --background {params.background_correction} \
             --array_type {params.array_type} \
+            --anno_file {params.anno_file} \
             --output_file {output.exp_file}
         """

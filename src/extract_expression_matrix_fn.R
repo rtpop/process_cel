@@ -9,7 +9,7 @@
 #' @param array_type A character string specifying the type of array (default is "HTA-2_0").
 #' @return None. The function saves the expression matrix to the specified output file.
 
-extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, normalise=FALSE, background=TRUE, array_type) {
+extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, normalise=FALSE, background=TRUE, array_type, anno_file = "annotation.txt") {
     files_metadata <- fread(cel_files, stringsAsFactors = FALSE)
     files <- as.vector(files_metadata[[1]])
     files <- file.path(raw_data_dir, files)
@@ -17,7 +17,7 @@ extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, norm
     exp <- exprs(data)
     
     # annotate expression matrix
-    anno <- annotate_expression_matrix(exp, files_metadata, array_type)
+    anno <- annotate_expression_matrix(exp, files_metadata, anno_file)
 
     # save expression matrix
     fwrite(as.data.frame(anno), file = output_file, sep = "\t", row.names = TRUE)
@@ -33,33 +33,26 @@ extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, norm
 #' @return A data frame with the annotated expression matrix, including gene names and Ensembl IDs.
 
 
-annotate_expression_matrix <- function(expression_matrix, files_metadata, array_type) {
-    array_type <- tolower(array_type)
-    if (array_type == "hta20") {
-        filter = "affy_hta_2_0"
-    } else if (array_type == "huex10") {
-        filter = "affy_huex_1_0_st_v2"
-    } else {
-        stop("Array type not supported")
-    }
-
+annotate_expression_matrix <- function(expression_matrix, files_metadata, anno_file = "annotation.txt") {
+    bm_filter <- "entrezgene_id"
+    
     # rename columns to tumour ids
-    colnames(expression_matrix) <- files_metadata$tumour_id[match(colnames(expression_matrix), files_metadata$cel_file_name)]
+    colnames(expression_matrix) <- files_metadata$tumour_id[match(colnames(expression_matrix), files_metadata$file_name)]
 
     # remove tag from probe ids
     rownames(expression_matrix) <- gsub("_at$", "", rownames(expression_matrix))
 
     # annotate genes
     mart <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-    annotations <- getBM(attributes = c("affy_hta_2_0", "ensembl_gene_id", "hgnc_symbol"),
-                         filters = filter,
+    annotations <- getBM(attributes = c("entrezgene_id", "ensembl_gene_id", "hgnc_symbol"),
+                         filters = bm_filter,
                          values = rownames(expression_matrix),
                          mart = mart)
+    
+    fwrite(annotations, file = anno_file, sep = "\t", row.names = FALSE)
 
-    annotated_exp <- as.data.frame(expression_matrix)
-    annotated_exp$gene_name <- annotations$hgnc_symbol[match(rownames(expression_matrix), annotations$affy_hta_2_0)]
-    annotated_exp$ensembl_id <- annotations$ensembl_gene_id[match(rownames(expression_matrix), annotations$affy_hta_2_0)]
+    rownames(expression_matrix) <- as.character(annotations$hgnc_symbol[match(rownames(expression_matrix), annotations$entrezgene_id)])
 
-    return(annotated_exp)
+    return(expression_matrix)
 }
 

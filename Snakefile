@@ -69,6 +69,7 @@ NORMALISE = config["normalise"]
 BACKGROUND_CORRECTION = config["background_correction"]
 NORMALISATION_METHOD = config["normalization_method"]
 BATCH_METADATA_COLUMN = config["batch_metadata_column"]
+ARRAY_TYPE = config["array_type"]
 
 ## ----- ##
 ## Rules ##
@@ -109,7 +110,8 @@ rule extract_expression_matrix:
     params:
         script = os.path.join(SRC_DIR, "extract_expression_matrix.R"), \
         normalise = NORMALISE, \
-        background_correction = BACKGROUND_CORRECTION
+        background_correction = BACKGROUND_CORRECTION, \
+        array_type = ARRAY_TYPE
     shell:
         """
         Rscript {params.script} \
@@ -117,5 +119,6 @@ rule extract_expression_matrix:
             --cel_files {input.raw_data_files} \
             --normalise {params.normalise} \
             --background {params.background_correction} \
+            --array_type {params.array_type} \
             --output_file {output.exp_file}
         """

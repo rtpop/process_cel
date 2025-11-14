@@ -29,13 +29,14 @@ metadata_file: "all_primary_samples.csv"
 # in case different batches of files need different processing (i.e. different batch correction, etc)
 # options: "all", "multi_region", "single_region"
 
-file_selection_method: "multi_region"
-normal_samples: false
-batch_metadata_column: "Batch_by_lot"
-normalise: FALSE
-background_correction: TRUE
-background_correction_method: "rma"
-normalization_method: "quantile"
+file_selection_method: "multi_region" # all | multi_region | single_region
+normal_samples: false # whether to include normal samples in the processing
+array_type: "hta20" # type of array: supported: hta20 | huex10 (case insensitive)
+batch_metadata_column: "Batch_by_lot" # column name in the metadata file indicating batches
+normalise: FALSE # whether to normalise the data
+background_correction: TRUE # whether to perform background correction
+background_correction_method: "rma" # method for background correction
+normalization_method: "quantile" # method for normalization
 
 ## ------------ ##
 ## Output files ##

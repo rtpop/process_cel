@@ -6,9 +6,10 @@
 #' @param metadata A character string specifying the path to the metadata CSV file.
 #' @param normalise A logical indicating whether to normalise the data (default is FALSE).
 #' @param background A logical indicating whether to perform background correction (default is TRUE).
+#' @param array_type A character string specifying the type of array (default is "HTA-2_0").
 #' @return None. The function saves the expression matrix to the specified output file.
 
-extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, normalise=FALSE, background=TRUE) {
+extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, normalise=FALSE, background=TRUE, array_type) {
     files_metadata <- fread(cel_files, stringsAsFactors = FALSE)
     files <- as.vector(files_metadata[[1]])
     files <- file.path(raw_data_dir, files)
@@ -16,13 +17,21 @@ extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, norm
     exp <- exprs(data)
     
     # annotate expression matrix
-    anno <- annotate_expression_matrix(exp, files_metadata)
+    anno <- annotate_expression_matrix(exp, files_metadata, array_type)
 
     # save expression matrix
     fwrite(as.data.frame(anno), file = output_file, sep = "\t", row.names = TRUE)
 }
 
-annotate_expression_matrix <- function(expression_matrix, files_metadata) {
+annotate_expression_matrix <- function(expression_matrix, files_metadata, array_type) {
+    array_type <- tolower(array_type)
+    if (array_type == "hta20") {
+        filter = "affy_hta_2_0"
+    } else if (array_type == "huex10") {
+        filter = "affy_huex_1_0_st_v2"
+    } else {
+        stop("Array type not supported")
+    }
 
     # rename columns to tumour ids
     colnames(expression_matrix) <- files_metadata$tumour_id[match(colnames(expression_matrix), files_metadata$cel_file_name)]
@@ -33,7 +42,7 @@ annotate_expression_matrix <- function(expression_matrix, files_metadata) {
     # annotate genes
     mart <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
     annotations <- getBM(attributes = c("affy_hta_2_0", "ensembl_gene_id", "hgnc_symbol"),
-                         filters = "affy_hta_2_0",
+                         filters = filter,
                          values = rownames(expression_matrix),
                          mart = mart)
 

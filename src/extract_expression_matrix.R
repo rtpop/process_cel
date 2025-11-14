@@ -20,6 +20,7 @@ option_list <- list(
     make_option(c("-r", "--raw_data_dir"), type="character", help="Path to raw data directory"),
     make_option(c("-o", "--output_file"), type="character", help="Path to save output expression matrix"),
     make_option(c("-n", "--normalise"), type="logical", default=FALSE, help="Whether to normalise the data [default %default]"),
+    make_option(c("-a", "--array_type"), type="character", help="Type of array (e.g., hta20, huex10)"),
     make_option(c("-b", "--background"), type="logical", default=TRUE, help="Whether to perform background correction [default %default]")
 )
 
@@ -33,4 +34,5 @@ extract_expression_matrix(cel_files = opt$cel_files,
                            output_file = opt$output_file,
                            raw_data_dir = opt$raw_data_dir,
                            normalise = opt$normalise,
-                           background = opt$background)
+                           background = opt$background,
+                           array_type = opt$array_type)

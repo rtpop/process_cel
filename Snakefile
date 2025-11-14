@@ -60,11 +60,15 @@ METADATA_FILE = os.path.join(DATA_DIR, config["metadata_file"])
 ## Intermediate files
 RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, "files_to_process.txt")
 
-EXP_FILE = os.path.join(PROCESSED_DATA_DIR, "expression_matrix.tsv")
+EXP_FILE_UNNORMALISED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_unnormalised"])
 
 
 ## Params
 FILE_SELECTION_METHOD = config["file_selection_method"]
+NORMALISE = config["normalise"]
+BACKGROUND_CORRECTION = config["background_correction"]
+NORMALISATION_METHOD = config["normalization_method"]
+BATCH_METADATA_COLUMN = config["batch_metadata_column"]
 
 ## ----- ##
 ## Rules ##
@@ -72,7 +76,8 @@ FILE_SELECTION_METHOD = config["file_selection_method"]
 
 rule all:
     input:
-        RAW_DATA_FILES
+        RAW_DATA_FILES, \
+        EXP_FILE_UNNORMALISED
 
 rule select_cel_files:
     input:
@@ -95,17 +100,22 @@ rule select_cel_files:
 
 rule extract_expression_matrix:
     input:
+        raw_data_dir = RAW_DATA_DIR, \
         raw_data_files = RAW_DATA_FILES, \
         metadata_file = METADATA_FILE
     output:
-        exp_file = EXP_FILE
+        exp_file = EXP_FILE_UNNORMALISED
     container: R_CONTAINER
     params:
-        script = os.path.join(SRC_DIR, "process_cel.R")
+        script = os.path.join(SRC_DIR, "extract_expression_matrix.R"), \
+        normalise = NORMALISE, \
+        background_correction = BACKGROUND_CORRECTION
     shell:
         """
         Rscript {params.script} \
-            --input_dir {input.raw_data_files} \
-            --metadata_file {input.metadata_file} \
+            --raw_data_dir {input.raw_data_dir} \
+            --cel_files {input.raw_data_files} \
+            --normalise {params.normalise} \
+            --background {params.background_correction} \
             --output_file {output.exp_file}
         """

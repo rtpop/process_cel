@@ -32,5 +32,15 @@ metadata_file: "all_primary_samples.csv"
 file_selection_method: "multi_region"
 normal_samples: false
 batch_metadata_column: "Batch_by_lot"
-background_correction: "rma"
+normalise: FALSE
+background_correction: TRUE
+background_correction_method: "rma"
 normalization_method: "quantile"
+
+## ------------ ##
+## Output files ##
+## ------------ ##
+
+exp_file_unnormalised: "multi_region_exp_unnormalised.txt"
+exp_file_batch_corrected: "multi_region_exp_batch_corrected.txt"
+exp_file_final: "multi_region_exp_final.txt"

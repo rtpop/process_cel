@@ -37,6 +37,9 @@ normalise: FALSE # whether to normalise the data
 background_correction: TRUE # whether to perform background correction
 background_correction_method: "rma" # method for background correction
 normalization_method: "quantile" # method for normalization
+average_by_tumour: TRUE # whether to average expression values by tumour
+compile_datasets: FALSE # whether to compile multiple datasets into a single expression matrix
+datasets_to_compile: [] # list of filenames of datasets to compile if compile_datasets is TRUE. These should be in processed_data_dir
 
 ## ------------ ##
 ## Output files ##

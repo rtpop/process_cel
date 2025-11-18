@@ -34,7 +34,7 @@ import time
 
 # Config file
 global CONFIG_PATH
-CONFIG_PATH = "config.yaml"
+CONFIG_PATH = "config_matched.yaml"
 configfile: CONFIG_PATH
 
 # Containers
@@ -71,6 +71,7 @@ FILE_SELECTION_METHOD = config["file_selection_method"]
 NORMALISE = config["normalise"]
 BACKGROUND_CORRECTION = config["background_correction"]
 NORMALISATION_METHOD = config["normalization_method"]
+BATCH_CORRECTION = config["batch_correction"]
 BATCH_METADATA_COLUMN = config["batch_metadata_column"]
 ARRAY_TYPE = config["array_type"]
 AVERAGE_BY_TUMOUR = config["average_by_tumour"]
@@ -82,7 +83,8 @@ AVERAGE_BY_TUMOUR = config["average_by_tumour"]
 rule all:
     input:
         RAW_DATA_FILES, \
-        EXP_FILE_UNNORMALISED
+        EXP_FILE_UNNORMALISED, \
+        EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot.pdf")
 
 rule select_cel_files:
     input:
@@ -129,29 +131,53 @@ rule extract_expression_matrix:
             --output_file {output.exp_file}
         """
 
-rule combat_batch_correction:
+rule pca_plot:
     input:
         exp_file = EXP_FILE_UNNORMALISED, \
         metadata_file = METADATA_FILE
     output:
-        exp_file_corrected = EXP_FILE_BATCH_CORRECTED
+        pca_plot = EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot.pdf")
     container: R_CONTAINER
     params:
-        script = os.path.join(SRC_DIR, "combat_batch_correction.R"), \
-        batch_metadata_column = BATCH_METADATA_COLUMN
+        script = os.path.join(SRC_DIR, "plot_pca.R"), \
+        color_by = config["pca_color_by"] if config["pca_color_by"] else "NULL", \
+        shape_by = config["pca_shape_by"] if config["pca_shape_by"] else "NULL", \
+        title = config["pca_title"]
     shell:
         """
         Rscript {params.script} \
-            --exp_file {input.exp_file} \
-            --metadata_file {input.metadata_file} \
-            --batch_metadata_column {params.batch_metadata_column} \
-            --output_file {output.exp_file_corrected}
+            --exp_mat {input.exp_file} \
+            --metadata {input.metadata_file} \
+            --color_by {params.color_by} \
+            --shape_by {params.shape_by} \
+            --title "{params.title}" \
+            --output_file {output.pca_plot}
         """
+
+if BATCH_CORRECTION:
+    rule combat_batch_correction:
+        input:
+            exp_file = EXP_FILE_UNNORMALISED, \
+            metadata_file = METADATA_FILE
+        output:
+            exp_file_corrected = EXP_FILE_BATCH_CORRECTED
+        container: R_CONTAINER
+        params:
+            script = os.path.join(SRC_DIR, "combat_batch_correction.R"), \
+            batch_metadata_column = BATCH_METADATA_COLUMN
+        shell:
+            """
+            Rscript {params.script} \
+                --exp_file {input.exp_file} \
+                --metadata_file {input.metadata_file} \
+                --batch_metadata_column {params.batch_metadata_column} \
+                --output_file {output.exp_file_corrected}
+            """
 
 if AVERAGE_BY_TUMOUR:
     rule rename_batch_corrected_file:
-        """"Changing the name of the batch corrected file to a temporary name before averaging so the normalisation rule works correctly
-        regardless of whether averaging is performed or not.""""
+        """Changing the name of the batch corrected file to a temporary name before averaging so the normalisation rule works correctly
+        regardless of whether averaging is performed or not."""
         input:
             exp_file = EXP_FILE_BATCH_CORRECTED
         output:

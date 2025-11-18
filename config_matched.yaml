@@ -42,11 +42,16 @@ average_by_tumour: TRUE # whether to average expression values by tumour
 compile_datasets: FALSE # whether to compile multiple datasets into a single expression matrix
 datasets_to_compile: [] # list of filenames of datasets to compile if compile_datasets is TRUE. These should be in processed_data_dir
 
+## PCA params ##
+pca_color_by: "Tissue" # column name in the metadata file to color points by
+pca_shape_by: NULL # column name in the metadata file to shape points by
+pca_title: "PCA of Matched Samples" # title of the PCA plot
+
 ## ------------ ##
 ## Output files ##
 ## ------------ ##
 
 exp_file_unnormalised: "matched_exp_final.txt"
-#exp_file_batch_corrected: "multi_region_exp_batch_corrected.txt"
-#exp_file_final: "multi_region_exp_final.txt"
-#annotation_file: "hta20_annotation.txt"
+exp_file_batch_corrected: "matched_exp_batch_corrected.txt"
+exp_file_final: "matched_exp_final.txt"
+annotation_file: "hta20_annotation.txt"

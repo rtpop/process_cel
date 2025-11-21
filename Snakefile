@@ -34,7 +34,7 @@ import time
 
 # Config file
 global CONFIG_PATH
-CONFIG_PATH = "config_matched.yaml"
+CONFIG_PATH = "config_multi_region.yaml"
 configfile: CONFIG_PATH
 
 # Containers

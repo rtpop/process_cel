@@ -17,6 +17,11 @@ plot_pca <- function(exp_mat, metadata, color_by = NULL, shape_by = NULL, title 
   
   # Merge with metadata
   pca_df <- merge(pca_df, metadata, by.x = "Sample", by.y = "Tumor_ID")
+
+    # Convert color variable to factor for discrete coloring
+  if (!is.null(color_by) && color_by != "NULL" && color_by %in% colnames(pca_df)) {
+    pca_df[[color_by]] <- as.factor(pca_df[[color_by]])
+  }
   
   # Create ggplot
   # Create base aesthetics

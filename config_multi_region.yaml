@@ -33,7 +33,7 @@ file_selection_method: "all" # all | multi_region | single_region
 normal_samples: false # whether to include normal samples in the processing
 array_type: "hta20" # type of array: supported: hta20 | huex10 (case insensitive)
 batch_correction: FALSE # whether to perform batch correction
-batch_metadata_column: "Batch_by_lot" # column name in the metadata file indicating batches
+batch_metadata_column: "Batch_by_Lot" # column name in the metadata file indicating batches
 normalise: FALSE # whether to normalise the data
 background_correction: TRUE # whether to perform background correction
 background_correction_method: "rma" # method for background correction
@@ -43,7 +43,7 @@ compile_datasets: FALSE # whether to compile multiple datasets into a single exp
 datasets_to_compile: [] # list of filenames of datasets to compile if compile_datasets is TRUE. These should be in processed_data_dir
 
 ## PCA params ##
-pca_color_by: "Batch_by_lot" # column name in the metadata file to color points by
+pca_color_by: "Batch_by_Lot" # column name in the metadata file to color points by
 pca_shape_by: NULL # column name in the metadata file to shape points by
 pca_title: "PCA of HTA multi-region + single region Samples" # title of the PCA plot
 

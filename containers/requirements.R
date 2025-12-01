@@ -37,7 +37,8 @@ required_packages_bioconductor <- c(
     "pcaMethods",       # For PCA analysis
     "pd.huex.1.0.st.v1", # For processing Affymetrix microarray data
     "hta20probeset.db", # For processing Affymetrix microarray data
-    "huex10stprobeset.db" # For processing Affymetrix microarray data
+    "huex10stprobeset.db", # For processing Affymetrix microarray data
+    "rtracklayer"
 
 )
 

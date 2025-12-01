@@ -18,7 +18,6 @@ required_packages_cran <- c(
     "remotes",        # For installing local or GitHub packages
     "sessioninfo",    # For session information
     "stringr"         # For string manipulation
-    
     )
 
 install.packages(
@@ -27,7 +26,7 @@ install.packages(
 
 ## Bioconductor packages:
 required_packages_bioconductor <- c(
-    "affy",            # For processing Affymetrix microarray data
+    "affy",             # For processing Affymetrix microarray data
     "biomaRt",          # For accessing BioMart databases
     "ComBat",           # For batch effect correction
     "limma",            # For limma analysis
@@ -35,15 +34,15 @@ required_packages_bioconductor <- c(
     "org.Hs.eg.db",     # For gene annotations
     "pd.hta.2.0",       # For processing Affymetrix microarray data
     "hta20cdf",         # For processing Affymetrix microarray data
-    "oligo",            # For processing oligonucleotide arrays
-    "pd.huex.1.0.st.v1" # For processing Affymetrix microarray data
+    "pcaMethods",       # For PCA analysis
+    "pd.huex.1.0.st.v1", # For processing Affymetrix microarray data
+    "hta20probeset.db", # For processing Affymetrix microarray data
+    "huex10stprobeset.db" # For processing Affymetrix microarray data
+
 )
 
 BiocManager::install(
     required_packages_bioconductor)
-
-## GitHub packages:
-remotes::install_github("kuijjerlab/MARMOT")  # For multi-omics data integration
 
 ## Install any local tarballs placed into /opt
 local_tarballs <- list.files("/opt", pattern="\\.tar\\.gz$", full.names=TRUE)

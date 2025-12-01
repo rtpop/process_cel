@@ -4,7 +4,7 @@ FROM rocker/r-ver:4.3.2
 ## How to build ##
 ## ------------ ##
 
-## sudo docker build --file containers/crc_multiomics/Dockerfile --no-cache -t rtpop/crc_multiomics:tag --progress=plain . 2>&1 | tee containers/crc_multiomics/logs/crc_multiomics:tag
+## sudo docker build --file containers/Dockerfile --no-cache -t rtpop/process_cel:tag --progress=plain . 2>&1 | tee containers/logs/process_cel:tag
 
 ## --------------------------- ##
 ## Install system requirements ##
@@ -63,7 +63,7 @@ RUN apt-get update -qq && \
 ## Copy required files ##
 ## ------------------- ##
 
-COPY containers/crc_multiomics/requirements.R /opt/requirements.R
+COPY containers/requirements.R /opt/requirements.R
 COPY containers/hta20hsentrezgcdf_25.0.0.tar.gz /opt/hta20hsentrezgcdf_25.0.0.tar.gz
 
 ## ---------------------------- ##

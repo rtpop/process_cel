@@ -18,7 +18,7 @@ RUN echo "deb http://archive.debian.org/debian/ jessie main" > /etc/apt/sources.
     echo "Acquire::Check-Valid-Until false;" > /etc/apt/apt.conf.d/99ignore-release-date
 
 RUN apt-get update -qq && \
-        apt-get install -y
+        apt-get install -y \
                 apt-utils \
                 libxml2-dev \
                 libjpeg-dev \
@@ -65,7 +65,7 @@ RUN apt-cache policy \
 
                 
 RUN apt-get update -qq && \
-        apt-get install -y
+        apt-get install -y \
                 build-essential \
                 git \
                 libcurl4-openssl-dev \

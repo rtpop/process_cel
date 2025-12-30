@@ -17,8 +17,7 @@ required_packages_cran <- c(
     "RColorBrewer",   # For color palettes for heatmaps
     "remotes",        # For installing local or GitHub packages
     "sessioninfo",    # For session information
-    "stringr",         # For string manipulation
-    "makecdfenv"     # For creating CDF environments for microarray data
+    "stringr"         # For string manipulation
     )
 
 install.packages(
@@ -40,7 +39,8 @@ required_packages_bioconductor <- c(
     #"huex10stprobeset.db", # For processing Affymetrix microarray data
     #"huex10sttranscriptcluster.db", # For processing Affymetrix microarray data
     "rtracklayer",
-    "liftOver"
+    "liftOver",
+    "makecdfenv"
 )
 
 BiocManager::install(

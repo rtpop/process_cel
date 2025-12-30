@@ -2,6 +2,8 @@
 ## List of R packages required ##
 ##-----------------------------##
 
+options(repos = c(CRAN = "https://cran.r-project.org"))
+
 ## CRAN packages:
 required_packages_cran <- c(
     "BiocManager",    # To install Bioconductor packages

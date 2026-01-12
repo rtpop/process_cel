@@ -48,8 +48,7 @@ annotate_expression_matrix <- function(expression_matrix, files_metadata, anno_f
     bm_filter <- "entrezgene_id"
     
     # rename columns to tumour ids
-    #colnames(expression_matrix) <- files_metadata$tumour_id[match(colnames(expression_matrix), files_metadata$file_name)]
-    colnames(expression_matrix) <- gsub(".CEL", "", colnames(expression_matrix), ignore.case = TRUE)
+    colnames(expression_matrix) <- files_metadata$tumour_id[match(colnames(expression_matrix), files_metadata$file_name)]
 
     # remove tag from probe ids
     rownames(expression_matrix) <- gsub("_at$", "", rownames(expression_matrix))

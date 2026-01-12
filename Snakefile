@@ -76,6 +76,15 @@ BATCH_METADATA_COLUMN = config["batch_metadata_column"]
 ARRAY_TYPE = config["array_type"]
 AVERAGE_BY_TUMOUR = config["average_by_tumour"]
 
+## helper functions ##
+# I don't know if this is the best way to do it
+def get_averaging_input():
+    """Determine which file should be input to averaging step"""
+    if BATCH_CORRECTION:
+        return EXP_FILE_BATCH_CORRECTED
+    else:
+        return EXP_FILE_UNNORMALISED
+
 ## ----- ##
 ## Rules ##
 ## ----- ##
@@ -84,7 +93,8 @@ rule all:
     input:
         RAW_DATA_FILES, \
         EXP_FILE_UNNORMALISED, \
-        EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot.pdf")
+        EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot.pdf"), \
+        #EXP_FILE_FINAL
 
 rule select_cel_files:
     input:
@@ -154,72 +164,72 @@ rule pca_plot:
             --output_file {output.pca_plot}
         """
 
-if BATCH_CORRECTION:
-    rule combat_batch_correction:
-        input:
-            exp_file = EXP_FILE_UNNORMALISED, \
-            metadata_file = METADATA_FILE
-        output:
-            exp_file_corrected = EXP_FILE_BATCH_CORRECTED
-        container: R_CONTAINER
-        params:
-            script = os.path.join(SRC_DIR, "combat_batch_correction.R"), \
-            batch_metadata_column = BATCH_METADATA_COLUMN
-        shell:
-            """
-            Rscript {params.script} \
-                --exp_file {input.exp_file} \
-                --metadata_file {input.metadata_file} \
-                --batch_metadata_column {params.batch_metadata_column} \
-                --output_file {output.exp_file_corrected}
-            """
+# if BATCH_CORRECTION:
+#     rule combat_batch_correction:
+#         input:
+#             exp_file = EXP_FILE_UNNORMALISED, \
+#             metadata_file = METADATA_FILE
+#         output:
+#             exp_file_corrected = EXP_FILE_BATCH_CORRECTED
+#         container: R_CONTAINER
+#         params:
+#             script = os.path.join(SRC_DIR, "combat_batch_correction.R"), \
+#             batch_metadata_column = BATCH_METADATA_COLUMN
+#         shell:
+#             """
+#             Rscript {params.script} \
+#                 --exp_file {input.exp_file} \
+#                 --metadata_file {input.metadata_file} \
+#                 --batch_metadata_column {params.batch_metadata_column} \
+#                 --output_file {output.exp_file_corrected}
+#             """
 
-if AVERAGE_BY_TUMOUR:
-    rule rename_batch_corrected_file:
-        """Changing the name of the batch corrected file to a temporary name before averaging so the normalisation rule works correctly
-        regardless of whether averaging is performed or not."""
-        input:
-            exp_file = EXP_FILE_BATCH_CORRECTED
-        output:
-            exp_file_rename = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_preavg.txt")
-        shell:
-            """
-            cp {input.exp_file} {output.exp_file_rename}
-            """
+# if AVERAGE_BY_TUMOUR:
+#     # rule rename_batch_corrected_file:
+#     #     """Changing the name of the batch corrected file to a temporary name before averaging so the normalisation rule works correctly
+#     #     regardless of whether averaging is performed or not."""
+#     #     input:
+#     #         exp_file = get_averaging_input()
+#     #     output:
+#     #         exp_file_rename = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_preavg.txt")
+#     #     shell:
+#     #         """
+#     #         cp {input.exp_file} {output.exp_file_rename}
+#     #         """
 
-    rule average_per_tumour:
-        input:
-            exp_file = EXP_FILE_BATCH_CORRECTED, \
-            metadata_file = METADATA_FILE
-        output:
-            exp_file_final = EXP_FILE_BATCH_CORRECTED
-        container: R_CONTAINER
-        params:
-            script = os.path.join(SRC_DIR, "average_per_tumour.R")
-        shell:
-            """
-            Rscript {params.script} \
-                --exp_file {input.exp_file} \
-                --metadata_file {input.metadata_file} \
-                --output_file {output.exp_file_final}
-            """
+#     rule average_per_tumour:
+#         input:
+#             exp_file = get_averaging_input(), \
+#             metadata_file = METADATA_FILE
+#         output:
+#             exp_file_final = EXP_FILE_FINAL
+#         container: R_CONTAINER
+#         params:
+#             script = os.path.join(SRC_DIR, "average_per_tumour.R")
+#         shell:
+#             """
+#             Rscript {params.script} \
+#                 --exp_file {input.exp_file} \
+#                 --metadata_file {input.metadata_file} \
+#                 --output_file {output.exp_file_final}
+#             """
 
 
 
-if NORMALISE:
-    rule normalise_final_expression:
-        input:
-            exp_file = EXP_FILE_BATCH_CORRECTED
-        output:
-            exp_file_final = EXP_FILE_FINAL
-        container: R_CONTAINER
-        params:
-            script = os.path.join(SRC_DIR, "normalise_final_expression.R"), \
-            normalization_method = NORMALISATION_METHOD
-        shell:
-            """
-            Rscript {params.script} \
-                --exp_file {input.exp_file} \
-                --normalization_method {params.normalization_method} \
-                --output_file {output.exp_file_final}
-            """
+# if NORMALISE:
+#     rule normalise_final_expression:
+#         input:
+#             exp_file = EXP_FILE_BATCH_CORRECTED
+#         output:
+#             exp_file_final = EXP_FILE_FINAL
+#         container: R_CONTAINER
+#         params:
+#             script = os.path.join(SRC_DIR, "normalise_final_expression.R"), \
+#             normalization_method = NORMALISATION_METHOD
+#         shell:
+#             """
+#             Rscript {params.script} \
+#                 --exp_file {input.exp_file} \
+#                 --normalization_method {params.normalization_method} \
+#                 --output_file {output.exp_file_final}
+#             """

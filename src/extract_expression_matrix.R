@@ -1,8 +1,10 @@
 required_libraries <- c("optparse",
                         "biomaRt",
-                        "affy",
+                        "data.table", 
                         "hta20hsentrezgcdf",
-                        "data.table")
+                        "huex10sthsentrezgcdf", 
+                        "affy"
+                        )
 
 for (library in required_libraries) {
     suppressPackageStartupMessages(library(library, character.only = TRUE, quietly = TRUE))

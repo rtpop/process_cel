@@ -1,4 +1,4 @@
-FROM rocker/r-ver:3.3.3
+FROM rocker/r-ver:4.3.2
 
 ## ------------ ##
 ## How to build ##
@@ -13,19 +13,15 @@ FROM rocker/r-ver:3.3.3
 RUN mkdir -p /opt/software
 WORKDIR /opt
 
-RUN echo "deb http://archive.debian.org/debian/ jessie main" > /etc/apt/sources.list && \
-    echo "deb http://archive.debian.org/debian-security/ jessie/updates main" >> /etc/apt/sources.list && \
-    echo "Acquire::Check-Valid-Until false;" > /etc/apt/apt.conf.d/99ignore-release-date
-
 RUN apt-get update -qq && \
-        apt-get install -y --allow-unauthenticated \
+        apt-get install -y --allow-downgrades \
                 apt-utils \
                 libxml2-dev \
                 libjpeg-dev \
                 libpng-dev \
                 libtiff-dev \
                 libicu-dev \
-                libgfortran3 \
+                libgfortran5 \
                 libnlopt-dev \
                 build-essential \
                 git \
@@ -65,7 +61,7 @@ RUN apt-cache policy \
 
                 
 RUN apt-get update -qq && \
-        apt-get install -y --allow-unauthenticated \
+        apt-get install -y --allow-downgrades \
                 build-essential \
                 git \
                 libcurl4-openssl-dev \

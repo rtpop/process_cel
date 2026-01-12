@@ -74,7 +74,7 @@ RUN apt-get update -qq && \
 ## ------------------- ##
 
 COPY containers/requirements.R /opt/requirements.R
-COPY containers/hta20hsentrezgcdf_25.0.0.tar.gz /opt/hta20hsentrezgcdf_25.0.0.tar.gz
+COPY containers/*tar.gz /opt
 
 ## ---------------------------- ##
 ## Install package requirements ##

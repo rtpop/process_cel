@@ -34,7 +34,7 @@ required_packages_bioconductor <- c(
     "org.Hs.eg.db",     # For gene annotations
     "pd.hta.2.0",       # For processing Affymetrix microarray data
     "hta20cdf",         # For processing Affymetrix microarray data
-    "pcaMethods",       # For PCA analysis
+    "pcaMethods"       # For PCA analysis
 )
 
 BiocManager::install(

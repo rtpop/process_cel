@@ -62,7 +62,7 @@ RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, "files_to_process.txt")
 
 EXP_FILE_UNNORMALISED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_unnormalised"])
 ANNO_FILE = os.path.join(PROCESSED_DATA_DIR, config["annotation_file"])
-EXP_FILE_BATCH_CORRECTED = EXP_FILE_UNNORMALISED.replace(".txt", "_batch_corrected.txt")
+EXP_FILE_BATCH_CORRECTED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_batch_corrected"])
 EXP_FILE_FINAL = os.path.join(PROCESSED_DATA_DIR, config["exp_file_final"])
 
 
@@ -94,6 +94,8 @@ rule all:
         RAW_DATA_FILES, \
         EXP_FILE_UNNORMALISED, \
         EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot.pdf"), \
+        EXP_FILE_BATCH_CORRECTED, \
+        EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot.pdf")
         #EXP_FILE_FINAL
 
 rule select_cel_files:
@@ -164,25 +166,48 @@ rule pca_plot:
             --output_file {output.pca_plot}
         """
 
-# if BATCH_CORRECTION:
-#     rule combat_batch_correction:
-#         input:
-#             exp_file = EXP_FILE_UNNORMALISED, \
-#             metadata_file = METADATA_FILE
-#         output:
-#             exp_file_corrected = EXP_FILE_BATCH_CORRECTED
-#         container: R_CONTAINER
-#         params:
-#             script = os.path.join(SRC_DIR, "combat_batch_correction.R"), \
-#             batch_metadata_column = BATCH_METADATA_COLUMN
-#         shell:
-#             """
-#             Rscript {params.script} \
-#                 --exp_file {input.exp_file} \
-#                 --metadata_file {input.metadata_file} \
-#                 --batch_metadata_column {params.batch_metadata_column} \
-#                 --output_file {output.exp_file_corrected}
-#             """
+if BATCH_CORRECTION:
+    rule combat_batch_correction:
+        input:
+            exp_file = EXP_FILE_UNNORMALISED, \
+            metadata_file = METADATA_FILE
+        output:
+            exp_file_corrected = EXP_FILE_BATCH_CORRECTED
+        container: R_CONTAINER
+        params:
+            script = os.path.join(SRC_DIR, "combat_batch_correction.R"), \
+            batch_metadata_column = BATCH_METADATA_COLUMN
+        shell:
+            """
+            Rscript {params.script} \
+                --exp_file {input.exp_file} \
+                --anno_file {input.metadata_file} \
+                --batch_col {params.batch_metadata_column} \
+                --out_file {output.exp_file_corrected}
+            """
+
+    rule pca_plot_batch_corrected:
+        input:
+            exp_file = EXP_FILE_BATCH_CORRECTED, \
+            metadata_file = METADATA_FILE
+        output:
+            pca_plot = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot.pdf")
+        container: R_CONTAINER
+        params:
+            script = os.path.join(SRC_DIR, "plot_pca.R"), \
+            color_by = config["pca_color_by"] if config["pca_color_by"] else "NULL", \
+            shape_by = config["pca_shape_by"] if config["pca_shape_by"] else "NULL", \
+            title = config["pca_title"] + " (Batch Corrected)"
+        shell:
+            """
+            Rscript {params.script} \
+                --exp_mat {input.exp_file} \
+                --metadata {input.metadata_file} \
+                --color_by {params.color_by} \
+                --shape_by {params.shape_by} \
+                --title "{params.title}" \
+                --output_file {output.pca_plot}
+            """
 
 # if AVERAGE_BY_TUMOUR:
 #     # rule rename_batch_corrected_file:

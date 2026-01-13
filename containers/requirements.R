@@ -30,19 +30,11 @@ install.packages(
 required_packages_bioconductor <- c(
     "affy",             # For processing Affymetrix microarray data
     "biomaRt",          # For accessing BioMart databases
-    "ComBat",           # For batch effect correction
+    "sva",              # For batch effect correction
     "org.Hs.eg.db",     # For gene annotations
     "pd.hta.2.0",       # For processing Affymetrix microarray data
     "hta20cdf",         # For processing Affymetrix microarray data
-    "pcaMethods",       # For PCA analysis
-    #"pd.huex.1.0.st.v1", # For processing Affymetrix microarray data
-    #"hta20probeset.db", # For processing Affymetrix microarray data
-    #"hta20transcriptcluster.db", # For processing Affymetrix microarray data
-    #"huex10stprobeset.db", # For processing Affymetrix microarray data
-    #"huex10sttranscriptcluster.db", # For processing Affymetrix microarray data
-    "rtracklayer",
-    "liftOver",
-    "makecdfenv"
+    "pcaMethods"       # For PCA analysis
 )
 
 BiocManager::install(

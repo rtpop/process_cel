@@ -1,7 +1,7 @@
 ## ---------- ##
 ## Containers ##
 ## ---------- ##
-r_container: "docker://rtpop/process_cel:0.7"
+r_container: "docker://rtpop/process_cel:0.8"
 
 ## Number of cores
 ncores: 30

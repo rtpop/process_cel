@@ -7,11 +7,15 @@
 #' @return A data frame or matrix of batch-corrected expression data.
 
 batch_correction <- function(exp_data, metadata, batch_col) {
-    
-    # Extract batch information
-    batch_info <- metadata[[batch_col]]
+
+    # Get the indices to reorder metadata to match exp_data column order
+    sample_order <- match(colnames(exp_data), metadata[, "Tumor_ID"])
+
+    # Extract batch information in the correct order
+    batch_info <- metadata[sample_order, batch_col]
     
     # Perform ComBat batch correction
+    print("Performing batch correction using ComBat...")
     corrected_data <- sva::ComBat(dat = as.matrix(exp_data), batch = batch_info, par.prior = TRUE, prior.plots = FALSE)
     
     return(as.data.frame(corrected_data))

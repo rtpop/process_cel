@@ -32,8 +32,6 @@ exp_data <- exp_data[, -1]
 
 # Read annotation/metadata
 metadata <- fread(opt$anno_file, data.table = FALSE)
-rownames(metadata) <- metadata[, 1]
-metadata <- metadata[, -1]
 
 # Perform batch correction
 corrected_exp_data <- batch_correction(exp_data, metadata, opt$batch_col)

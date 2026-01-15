@@ -58,7 +58,7 @@ SRC_DIR = config["src_dir"]
 METADATA_FILE = os.path.join(DATA_DIR, config["metadata_file"])
 
 ## Intermediate files
-RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, "files_to_process.txt")
+RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, config["raw_data_files"])
 
 EXP_FILE_UNNORMALISED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_unnormalised"])
 ANNO_FILE = os.path.join(PROCESSED_DATA_DIR, config["annotation_file"])
@@ -78,12 +78,21 @@ AVERAGE_BY_TUMOUR = config["average_by_tumour"]
 
 ## helper functions ##
 # I don't know if this is the best way to do it
-def get_averaging_input():
-    """Determine which file should be input to averaging step"""
+def get_all_inputs():
+    """Get all required input files based on configuration"""
+    inputs = [
+        RAW_DATA_FILES,
+        EXP_FILE_UNNORMALISED,
+        EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot.pdf")
+    ]
+    
     if BATCH_CORRECTION:
-        return EXP_FILE_BATCH_CORRECTED
-    else:
-        return EXP_FILE_UNNORMALISED
+        inputs.extend([
+            EXP_FILE_BATCH_CORRECTED,
+            EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot.pdf")
+        ])
+    
+    return inputs
 
 ## ----- ##
 ## Rules ##
@@ -91,13 +100,7 @@ def get_averaging_input():
 
 rule all:
     input:
-        RAW_DATA_FILES, \
-        EXP_FILE_UNNORMALISED, \
-        EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot.pdf"), \
-        EXP_FILE_BATCH_CORRECTED, \
-        EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot.pdf")
-        #EXP_FILE_FINAL
-
+        get_all_inputs()
 rule select_cel_files:
     input:
         raw_data_dir = RAW_DATA_DIR, \
@@ -107,14 +110,16 @@ rule select_cel_files:
     container: R_CONTAINER
     params:
         script = os.path.join(SRC_DIR, "selecting_cel_files.R"), \
-        file_selection_method = FILE_SELECTION_METHOD
+        file_selection_method = FILE_SELECTION_METHOD, \
+        array_type = ARRAY_TYPE
     shell:
         """
         Rscript {params.script} \
             --raw_data_dir {input.raw_data_dir} \
             --metadata_file {input.metadata_file} \
             --file_selection_method {params.file_selection_method} \
-            --output_file {output.raw_data_files}
+            --output_file {output.raw_data_files} \
+            --array_type {params.array_type}
         """
 
 rule extract_expression_matrix:

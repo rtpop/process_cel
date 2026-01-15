@@ -31,8 +31,8 @@ metadata_file: "all_primary_samples.csv"
 
 file_selection_method: "all" # all | multi_region | single_region
 normal_samples: false # whether to include normal samples in the processing
-array_type: "hta20" # type of array: supported: hta20 | huex10 (case insensitive)
-batch_correction: TRUE # whether to perform batch correction
+array_type: "huex10" # type of array: supported: hta20 | huex10 (case insensitive)
+batch_correction: FALSE # whether to perform batch correction
 batch_metadata_column: "Batch_by_Lot" # column name in the metadata file indicating batches
 normalise: FALSE # whether to normalise the data
 background_correction: TRUE # whether to perform background correction
@@ -41,18 +41,18 @@ normalization_method: "quantile" # method for normalization
 average_by_tumour: FALSE # whether to average expression values by tumour
 compile_datasets: FALSE # whether to compile multiple datasets into a single expression matrix
 datasets_to_compile: [] # list of filenames of datasets to compile if compile_datasets is TRUE. These should be in processed_data_dir
-raw_data_files: "files_to_process_hta.txt" # text file with list of raw data files to process (one file per line)
+raw_data_files: "files_to_process_huex.txt" # text file with list of raw data files to process (one file per line)
 
 ## PCA params ##
 pca_color_by: "Batch_by_Lot" # column name in the metadata file to color points by
 pca_shape_by: NULL # column name in the metadata file to shape points by
-pca_title: "PCA of HTA multi-region + single region Samples" # title of the PCA plot
+pca_title: "PCA of Huex Samples" # title of the PCA plot
 
 ## ------------ ##
 ## Output files ##
 ## ------------ ##
 
-exp_file_unnormalised: "hta_all_exp_unnormalised.txt"
-exp_file_batch_corrected: "hta_all_exp_batch_corrected.txt"
-exp_file_final: "hta_all_exp_final.txt"
-annotation_file: "hta20_annotation_reanno.txt"
+exp_file_unnormalised: "huex_all_exp_unnormalised.txt"
+exp_file_batch_corrected: "huex_all_exp_batch_corrected.txt"
+exp_file_final: "huex_all_exp_final.txt"
+annotation_file: "huex10_annotation_reanno.txt"

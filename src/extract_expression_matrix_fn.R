@@ -19,7 +19,7 @@ extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, norm
     if (array_type == "hta20") {
         cdfname = "hta20_Hs_ENTREZG"
     } else if (array_type == "huex10") {
-        cdfname = "huex10_Hs_ENTREZG"
+        cdfname = "huex10_St_Hs_ENTREZG"
     } else {
         stop(paste0("Array type ", array_type, " not supported."))
     }
@@ -52,9 +52,10 @@ annotate_expression_matrix <- function(expression_matrix, files_metadata, anno_f
 
     # remove tag from probe ids
     rownames(expression_matrix) <- gsub("_at$", "", rownames(expression_matrix))
+    str(expression_matrix)
 
     # annotate genes
-    mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
+    mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl", host="https://useast.ensembl.org")
     annotations <- getBM(
         attributes = c("entrezgene_id", "hgnc_symbol"),
         filters = "entrezgene_id", 

@@ -38,7 +38,7 @@ CONFIG_PATH = "config_multi_region.yaml"
 configfile: CONFIG_PATH
 
 # Containers
-R_CONTAINER = config["r_container"]
+R_CONTAINER = config.get("r_container", "")
 
 # Number of cores
 NCORES = config["ncores"]

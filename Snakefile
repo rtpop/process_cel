@@ -157,9 +157,9 @@ rule pca_plot:
     container: R_CONTAINER
     params:
         script = os.path.join(SRC_DIR, "plot_pca.R"), \
-        color_by = config.get["pca_color_by"] if config.get["pca_color_by"] else "NULL", \
-        shape_by = config.get["pca_shape_by"] if config.get["pca_shape_by"] else "NULL", \
-        title = config.get["pca_title"]
+        color_by = config.get["pca_color_by"] if config.get("pca_color_by") else "NULL", \
+        shape_by = config.get["pca_shape_by"] if config.get("pca_shape_by") else "NULL", \
+        title = config.get("pca_title", "")
     shell:
         """
         Rscript {params.script} \

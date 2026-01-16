@@ -55,7 +55,7 @@ SRC_DIR = config.get("src_dir", "")
 ## ----------------------------------------- ##
 
 ## Input files
-METADATA_FILE = os.path.join(DATA_DIR, config.get{"metadata_file", ""))
+METADATA_FILE = os.path.join(DATA_DIR, config.get("metadata_file", ""))
 
 ## Intermediate files
 RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, config.get("raw_data_files", ""))

@@ -45,9 +45,9 @@ NCORES = config["ncores"]
 
 
 # Directories
-DATA_DIR = config["data_dir"]
-RAW_DATA_DIR = config["raw_data_dir"]
-PROCESSED_DATA_DIR = config["processed_data_dir"]
+DATA_DIR = config.get("data_dir", "")
+RAW_DATA_DIR = config.get("raw_data_dir", "")
+PROCESSED_DATA_DIR = config.get("processed_data_dir", "")
 SRC_DIR = config["src_dir"]
 
 ## ----------------------------------------- ##

@@ -22,7 +22,17 @@ RUN apt-get update -qq && \
                 libtiff-dev \
                 libicu-dev \
                 libgfortran5 \
-                libnlopt-dev
+                libnlopt-dev \
+                build-essential \
+                git \
+                pkg-config \
+                libcurl4-openssl-dev \
+                libssl-dev \
+                zlib1g-dev \
+                libbz2-dev \
+                liblzma-dev \
+                xz-utils \
+                libncurses5-dev
 
 RUN apt-cache policy \
         apt-utils \
@@ -64,7 +74,7 @@ RUN apt-get update -qq && \
 ## ------------------- ##
 
 COPY containers/requirements.R /opt/requirements.R
-COPY containers/hta20hsentrezgcdf_25.0.0.tar.gz /opt/hta20hsentrezgcdf_25.0.0.tar.gz
+COPY containers/*tar.gz /opt
 
 ## ---------------------------- ##
 ## Install package requirements ##

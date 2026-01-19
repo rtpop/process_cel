@@ -2,6 +2,8 @@
 ## List of R packages required ##
 ##-----------------------------##
 
+options(repos = c(CRAN = "https://cran.r-project.org"))
+
 ## CRAN packages:
 required_packages_cran <- c(
     "BiocManager",    # To install Bioconductor packages
@@ -28,18 +30,11 @@ install.packages(
 required_packages_bioconductor <- c(
     "affy",             # For processing Affymetrix microarray data
     "biomaRt",          # For accessing BioMart databases
-    "ComBat",           # For batch effect correction
-    "limma",            # For limma analysis
-    "fgsea",            # For gene set enrichment analysis
+    "sva",              # For batch effect correction
     "org.Hs.eg.db",     # For gene annotations
     "pd.hta.2.0",       # For processing Affymetrix microarray data
     "hta20cdf",         # For processing Affymetrix microarray data
-    "pcaMethods",       # For PCA analysis
-    "pd.huex.1.0.st.v1", # For processing Affymetrix microarray data
-    "hta20probeset.db", # For processing Affymetrix microarray data
-    "huex10stprobeset.db", # For processing Affymetrix microarray data
-    "rtracklayer"
-
+    "pcaMethods"       # For PCA analysis
 )
 
 BiocManager::install(

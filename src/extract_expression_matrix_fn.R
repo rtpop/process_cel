@@ -1,19 +1,30 @@
 #' @name extract_expression_matrix
 #' @title Extract expression matrix from CEL files
-#' @description This function reads CEL files and extracts the expression matrix using the affy package.
+#' @description This function reads CEL files and extracts the expression matrix using the oligo package.
 #' @param cel_files A character vector of file paths to the CEL files.
 #' @param output_file A character string specifying the path to save the output expression matrix.
 #' @param metadata A character string specifying the path to the metadata CSV file.
 #' @param normalise A logical indicating whether to normalise the data (default is FALSE).
 #' @param background A logical indicating whether to perform background correction (default is TRUE).
-#' @param array_type A character string specifying the type of array (default is "HTA-2_0").
+#' @param array_type A character string specifying the type of array.
 #' @return None. The function saves the expression matrix to the specified output file.
 
 extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, normalise=FALSE, background=TRUE, array_type, anno_file = "annotation.txt") {
+    # read cel files
     files_metadata <- fread(cel_files, stringsAsFactors = FALSE)
     files <- as.vector(files_metadata[[1]])
     files <- file.path(raw_data_dir, files)
-    data <- justRMA(filenames = files, cdfname = "hta20_Hs_ENTREZG", background=background, normalize=normalise)
+
+    # set cdf name
+    if (array_type == "hta20") {
+        cdfname = "hta20_Hs_ENTREZG"
+    } else if (array_type == "huex10") {
+        cdfname = "huex10_St_Hs_ENTREZG"
+    } else {
+        stop(paste0("Array type ", array_type, " not supported."))
+    }
+
+    data <- justRMA(filenames = files, cdfname = cdfname, background=background, normalize=normalise)
     exp <- exprs(data)
     
     # annotate expression matrix
@@ -41,17 +52,31 @@ annotate_expression_matrix <- function(expression_matrix, files_metadata, anno_f
 
     # remove tag from probe ids
     rownames(expression_matrix) <- gsub("_at$", "", rownames(expression_matrix))
+    str(expression_matrix)
 
     # annotate genes
-    mart <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-    annotations <- getBM(attributes = c("entrezgene_id", "ensembl_gene_id", "hgnc_symbol"),
-                         filters = bm_filter,
-                         values = rownames(expression_matrix),
-                         mart = mart)
-    
-    fwrite(annotations, file = anno_file, sep = "\t", row.names = FALSE)
+    mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl", host="https://useast.ensembl.org")
+    annotations <- getBM(
+        attributes = c("entrezgene_id", "hgnc_symbol"),
+        filters = "entrezgene_id", 
+        values = unique(rownames(expression_matrix)),
+        mart = mart
+    )
 
-    rownames(expression_matrix) <- as.character(annotations$hgnc_symbol[match(rownames(expression_matrix), annotations$entrezgene_id)])
+    # merge annotations with expression matrix
+    expression_matrix <- as.data.frame(expression_matrix)
+    expression_matrix$gene_name <- annotations$hgnc_symbol[match(rownames(expression_matrix), annotations$entrezgene_id)]
+
+    # remove rows with no gene name
+    expression_matrix <- expression_matrix[!is.na(expression_matrix$gene_name) & expression_matrix$gene_name != "", ]
+
+    # handle duplicate gene names by averaging
+    gene_names <- expression_matrix$gene_name
+
+    # average by gene name
+    expression_matrix <- aggregate(. ~ gene_name, data = expression_matrix, FUN = mean, na.rm = TRUE)
+    rownames(expression_matrix) <- expression_matrix$gene_name
+    expression_matrix <- expression_matrix[, -1]
 
     return(expression_matrix)
 }

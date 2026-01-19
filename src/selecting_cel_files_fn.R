@@ -12,12 +12,17 @@ select_cel_files <- function(raw_data_dir, metadata_file, file_selection_method 
     # Load metadata
     metadata <- read.csv(metadata_file, stringsAsFactors = FALSE)
     
+    array_type <- tolower(array_type)
+    print(paste("Array type:", array_type))
+    
     # select only files of the correct array type
     if (array_type == "hta20") {
+        print("Getting HTA files")
         # Filter metadata first, then create cel_files
         filtered_metadata <- metadata[which(metadata$Array == "HTA"), ]
         # Then recreate cel_files based on file_selection_method using filtered_metadata
     } else if (array_type == "huex10") {
+        print("Getting HUEX files")
         filtered_metadata <- metadata[which(metadata$Array == "HuEx"), ]
     } else {
         stop("Invalid array type.")

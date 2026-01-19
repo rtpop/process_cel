@@ -64,7 +64,8 @@ EXP_FILE_UNNORMALISED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_unnorm
 ANNO_FILE = os.path.join(PROCESSED_DATA_DIR, config["annotation_file"])
 EXP_FILE_BATCH_CORRECTED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_batch_corrected"])
 EXP_FILE_FINAL = os.path.join(PROCESSED_DATA_DIR, config["exp_file_final"])
-
+PCA_PLOT = EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot_msi.pdf")
+PCA_PLOT_BATCH_CORRECTED = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot_msi.pdf")
 
 ## Params
 FILE_SELECTION_METHOD = config["file_selection_method"]
@@ -83,13 +84,13 @@ def get_all_inputs():
     inputs = [
         RAW_DATA_FILES,
         EXP_FILE_UNNORMALISED,
-        EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot.pdf")
+        PCA_PLOT
     ]
     
     if BATCH_CORRECTION:
         inputs.extend([
             EXP_FILE_BATCH_CORRECTED,
-            EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot.pdf")
+            PCA_PLOT_BATCH_CORRECTED
         ])
     
     return inputs
@@ -101,6 +102,7 @@ def get_all_inputs():
 rule all:
     input:
         get_all_inputs()
+
 rule select_cel_files:
     input:
         raw_data_dir = RAW_DATA_DIR, \
@@ -153,7 +155,7 @@ rule pca_plot:
         exp_file = EXP_FILE_UNNORMALISED, \
         metadata_file = METADATA_FILE
     output:
-        pca_plot = EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot.pdf")
+        pca_plot = PCA_PLOT
     container: R_CONTAINER
     params:
         script = os.path.join(SRC_DIR, "plot_pca.R"), \
@@ -196,7 +198,7 @@ if BATCH_CORRECTION:
             exp_file = EXP_FILE_BATCH_CORRECTED, \
             metadata_file = METADATA_FILE
         output:
-            pca_plot = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot.pdf")
+            pca_plot = PCA_PLOT_BATCH_CORRECTED
         container: R_CONTAINER
         params:
             script = os.path.join(SRC_DIR, "plot_pca.R"), \

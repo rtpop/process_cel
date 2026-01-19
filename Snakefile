@@ -32,33 +32,33 @@ import time
 ## Global parameters ##
 ## ----------------- ##
 
-# Config file
+# config file
 global CONFIG_PATH
 CONFIG_PATH = "config_multi_region.yaml"
 configfile: CONFIG_PATH
 
 # Containers
-R_CONTAINER = config["r_container"]
+R_CONTAINER = config.get("r_container", "")
 
 # Number of cores
-NCORES = config["ncores"]
+NCORES = config.get("ncores", "")
 
 
 # Directories
-DATA_DIR = config["data_dir"]
-RAW_DATA_DIR = config["raw_data_dir"]
-PROCESSED_DATA_DIR = config["processed_data_dir"]
-SRC_DIR = config["src_dir"]
+DATA_DIR = config.get("data_dir", "")
+RAW_DATA_DIR = config.get("raw_data_dir", "")
+PROCESSED_DATA_DIR = config.get("processed_data_dir", "")
+SRC_DIR = config.get("src_dir", "")
 
 ## ----------------------------------------- ##
 ## Processing CEL files to expression matrix ##
 ## ----------------------------------------- ##
 
 ## Input files
-METADATA_FILE = os.path.join(DATA_DIR, config["metadata_file"])
+METADATA_FILE = os.path.join(DATA_DIR, config.get("metadata_file", ""))
 
 ## Intermediate files
-RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, config["raw_data_files"])
+RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, config.get("raw_data_files", ""))
 
 EXP_FILE_UNNORMALISED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_unnormalised"])
 ANNO_FILE = os.path.join(PROCESSED_DATA_DIR, config["annotation_file"])
@@ -68,14 +68,14 @@ PCA_PLOT = EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot_msi.pdf")
 PCA_PLOT_BATCH_CORRECTED = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot_msi.pdf")
 
 ## Params
-FILE_SELECTION_METHOD = config["file_selection_method"]
-NORMALISE = config["normalise"]
-BACKGROUND_CORRECTION = config["background_correction"]
-NORMALISATION_METHOD = config["normalization_method"]
-BATCH_CORRECTION = config["batch_correction"]
-BATCH_METADATA_COLUMN = config["batch_metadata_column"]
-ARRAY_TYPE = config["array_type"]
-AVERAGE_BY_TUMOUR = config["average_by_tumour"]
+FILE_SELECTION_METHOD = config.get("file_selection_method", "")
+NORMALISE = config.get("normalise", "")
+BACKGROUND_CORRECTION = config.get("background_correction","")
+NORMALISATION_METHOD = config.get("normalization_method","")
+BATCH_CORRECTION = config.get("batch_correction","")
+BATCH_METADATA_COLUMN = config.get("batch_metadata_column", "")
+ARRAY_TYPE = config.get("array_type", "")
+AVERAGE_BY_TUMOUR = config.get("average_by_tumour", "")
 
 ## helper functions ##
 # I don't know if this is the best way to do it
@@ -159,9 +159,9 @@ rule pca_plot:
     container: R_CONTAINER
     params:
         script = os.path.join(SRC_DIR, "plot_pca.R"), \
-        color_by = config["pca_color_by"] if config["pca_color_by"] else "NULL", \
-        shape_by = config["pca_shape_by"] if config["pca_shape_by"] else "NULL", \
-        title = config["pca_title"]
+        color_by = config.get("pca_color_by", "") if config.get("pca_color_by") else "NULL", \
+        shape_by = config.get("pca_shape_by", "") if config.get("pca_shape_by") else "NULL", \
+        title = config.get("pca_title", "")
     shell:
         """
         Rscript {params.script} \
@@ -202,9 +202,9 @@ if BATCH_CORRECTION:
         container: R_CONTAINER
         params:
             script = os.path.join(SRC_DIR, "plot_pca.R"), \
-            color_by = config["pca_color_by"] if config["pca_color_by"] else "NULL", \
-            shape_by = config["pca_shape_by"] if config["pca_shape_by"] else "NULL", \
-            title = config["pca_title"] + " (Batch Corrected)"
+            color_by = config.get["pca_color_by"] if config.get["pca_color_by"] else "NULL", \
+            shape_by = config.get["pca_shape_by"] if config.get["pca_shape_by"] else "NULL", \
+            title = config.get["pca_title"] + " (Batch Corrected)"
         shell:
             """
             Rscript {params.script} \

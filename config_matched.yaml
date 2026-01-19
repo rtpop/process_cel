@@ -51,7 +51,7 @@ pca_title: "PCA of Matched Samples" # title of the PCA plot
 ## Output files ##
 ## ------------ ##
 
-exp_file_unnormalised: "matched_exp_final.txt"
+exp_file_unnormalised: "matched_exp_all_smpl.txt"
 exp_file_batch_corrected: "matched_exp_batch_corrected.txt"
 exp_file_final: "matched_exp_final.txt"
 annotation_file: "hta20_annotation.txt"

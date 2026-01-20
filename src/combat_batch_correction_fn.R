@@ -8,6 +8,9 @@
 
 batch_correction <- function(exp_data, metadata, batch_col) {
 
+    # remove deduplication suffixes from sample names in exp_data
+    colnames(exp_data) <- gsub("\\.\\d+$", "", colnames(exp_data))
+
     # Get the indices to reorder metadata to match exp_data column order
     sample_order <- match(colnames(exp_data), metadata[, "Tumor_ID"])
 

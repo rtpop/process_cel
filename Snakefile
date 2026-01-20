@@ -64,8 +64,12 @@ EXP_FILE_UNNORMALISED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_unnorm
 ANNO_FILE = os.path.join(PROCESSED_DATA_DIR, config["annotation_file"])
 EXP_FILE_BATCH_CORRECTED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_batch_corrected"])
 EXP_FILE_FINAL = os.path.join(PROCESSED_DATA_DIR, config["exp_file_final"])
-PCA_PLOT = EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot_msi.pdf")
-PCA_PLOT_BATCH_CORRECTED = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot_msi.pdf")
+
+# pca params
+PCA_PLOT = EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot_msi_top_1000_genes.pdf")
+PCA_PLOT_BATCH_CORRECTED = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot_msi_top_1000_genes.pdf")
+TOP_N = config.get("top_n", "")
+N_PROBES = config.get("n_probes", "")
 
 ## Params
 FILE_SELECTION_METHOD = config.get("file_selection_method", "")
@@ -161,7 +165,10 @@ rule pca_plot:
         script = os.path.join(SRC_DIR, "plot_pca.R"), \
         color_by = config.get("pca_color_by", "") if config.get("pca_color_by") else "NULL", \
         shape_by = config.get("pca_shape_by", "") if config.get("pca_shape_by") else "NULL", \
-        title = config.get("pca_title", "")
+        title = config.get("pca_title", ""), \
+        top_n = TOP_N, \
+        n_probes = N_PROBES
+        
     shell:
         """
         Rscript {params.script} \
@@ -170,7 +177,9 @@ rule pca_plot:
             --color_by {params.color_by} \
             --shape_by {params.shape_by} \
             --title "{params.title}" \
-            --output_file {output.pca_plot}
+            --output_file {output.pca_plot} \
+            --top_n {params.top_n} \
+            --n_probes {params.n_probes}
         """
 
 if BATCH_CORRECTION:
@@ -202,9 +211,11 @@ if BATCH_CORRECTION:
         container: R_CONTAINER
         params:
             script = os.path.join(SRC_DIR, "plot_pca.R"), \
-            color_by = config.get["pca_color_by"] if config.get["pca_color_by"] else "NULL", \
-            shape_by = config.get["pca_shape_by"] if config.get["pca_shape_by"] else "NULL", \
-            title = config.get["pca_title"] + " (Batch Corrected)"
+            color_by = config.get("pca_color_by") if config.get("pca_color_by") else "NULL", \
+            shape_by = config.get("pca_shape_by") if config.get("pca_shape_by") else "NULL", \
+            title = config.get("pca_title") + " (Batch Corrected)", \
+            top_n = TOP_N, \
+            n_probes = N_PROBES
         shell:
             """
             Rscript {params.script} \
@@ -213,38 +224,40 @@ if BATCH_CORRECTION:
                 --color_by {params.color_by} \
                 --shape_by {params.shape_by} \
                 --title "{params.title}" \
-                --output_file {output.pca_plot}
+                --output_file {output.pca_plot} \
+                --top_n {params.top_n} \
+                --n_probes {params.n_probes}
             """
 
-# if AVERAGE_BY_TUMOUR:
-#     # rule rename_batch_corrected_file:
-#     #     """Changing the name of the batch corrected file to a temporary name before averaging so the normalisation rule works correctly
-#     #     regardless of whether averaging is performed or not."""
-#     #     input:
-#     #         exp_file = get_averaging_input()
-#     #     output:
-#     #         exp_file_rename = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_preavg.txt")
-#     #     shell:
-#     #         """
-#     #         cp {input.exp_file} {output.exp_file_rename}
-#     #         """
+if AVERAGE_BY_TUMOUR:
+    rule rename_batch_corrected_file:
+        """Changing the name of the batch corrected file to a temporary name before averaging so the normalisation rule works correctly
+        regardless of whether averaging is performed or not."""
+        input:
+            exp_file = get_averaging_input()
+        output:
+            exp_file_rename = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_preavg.txt")
+        shell:
+            """
+            cp {input.exp_file} {output.exp_file_rename}
+            """
 
-#     rule average_per_tumour:
-#         input:
-#             exp_file = get_averaging_input(), \
-#             metadata_file = METADATA_FILE
-#         output:
-#             exp_file_final = EXP_FILE_FINAL
-#         container: R_CONTAINER
-#         params:
-#             script = os.path.join(SRC_DIR, "average_per_tumour.R")
-#         shell:
-#             """
-#             Rscript {params.script} \
-#                 --exp_file {input.exp_file} \
-#                 --metadata_file {input.metadata_file} \
-#                 --output_file {output.exp_file_final}
-#             """
+    rule average_per_tumour:
+        input:
+            exp_file = get_averaging_input(), \
+            metadata_file = METADATA_FILE
+        output:
+            exp_file_final = EXP_FILE_FINAL
+        container: R_CONTAINER
+        params:
+            script = os.path.join(SRC_DIR, "average_per_tumour.R")
+        shell:
+            """
+            Rscript {params.script} \
+                --exp_file {input.exp_file} \
+                --metadata_file {input.metadata_file} \
+                --output_file {output.exp_file_final}
+            """
 
 
 

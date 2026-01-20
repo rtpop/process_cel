@@ -6,9 +6,23 @@
 #' @param color_by Column name in metadata to color points by.
 #' @param shape_by Column name in metadata to shape points by.
 #' @param title Title of the plot.
-#' 
+#' @param top_n Logical, whether to use top N variable genes for PCA.
+#' @param n Number of top variable genes to use if top_n is TRUE.
 
-plot_pca <- function(exp_mat, metadata, color_by = NULL, shape_by = NULL, title = "PCA Plot") {
+plot_pca <- function(exp_mat, metadata, color_by = NULL, shape_by = NULL, title = "PCA Plot", top_n = FALSE, n = 1000) {
+  
+  # if (top_n) {
+  #   # Select top N variable genes
+  #   gene_vars <- apply(exp_mat, 1, var)
+  #   top_genes <- names(sort(gene_vars, decreasing = TRUE))[1:n]
+  #   exp_mat <- exp_mat[top_genes, ]
+  # }
+
+  if (top_n) {
+    # Select top N variable genes
+    exp_mat <- exp_mat[order(matrixStats::rowVars(exp_mat), decreasing = TRUE)[1:n], ]
+  }
+
   # Perform PCA
   pca_res <- pcaMethods::pca(t(exp_mat), scale. = TRUE)
   pca_df <- as.data.frame(pca_res@scores[, 1:2])

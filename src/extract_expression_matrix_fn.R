@@ -74,9 +74,9 @@ annotate_expression_matrix <- function(expression_matrix, files_metadata, anno_f
     gene_names <- expression_matrix$gene_name
 
     # average by gene name
-    expression_matrix <- aggregate(. ~ gene_name, data = expression_matrix, FUN = mean, na.rm = TRUE)
-    rownames(expression_matrix) <- expression_matrix$gene_name
-    expression_matrix <- expression_matrix[, -1]
+    expression_matrix_split <- split(expression_matrix[, -ncol(expression_matrix)], gene_names)
+    expression_matrix <- do.call(rbind, lapply(expression_matrix_split, function(x) colMeans(x)))
+    rownames(expression_matrix) <- names(expression_matrix_split)
 
     return(expression_matrix)
 }

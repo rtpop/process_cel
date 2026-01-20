@@ -8,18 +8,24 @@
 
 average_per_tumour <- function(exp_file, meta_file, tumour_col, out_file) {
     # Read expression data
-    exp_data <- fread(exp_file, data.table = FALSE)
+    exp_data <- fread(exp_file, data.table = FALSE, check.names = FALSE)
     rownames(exp_data) <- exp_data[, 1]
     exp_data <- exp_data[, -1]
-    
+    colnames(exp_data) <- gsub("\\.\\d+$", "", colnames(exp_data))
+
     # Read metadata/annotation
     metadata <- fread(meta_file, data.table = FALSE)
     
     # Average expression data per tumour/sample type
-    exp_split  <- split(exp_data, metadata[[tumour_col]])
-    averaged_exp_data <- sapply(exp_split, function(x) rowMeans(x, na.rm = TRUE))
     
+    # transpose data frame for splitting
+    exp_matrix <- t(as.matrix(exp_data))
+    exp_split  <- split.data.frame(exp_matrix, rownames(exp_matrix))
+
+    averaged_exp_list <- lapply(exp_split, function(x) colMeans(x, na.rm = TRUE))
+    averaged_exp_data <- do.call(cbind, averaged_exp_list)
+    rownames(averaged_exp_data) <- rownames(exp_data)
+
     # Save averaged expression data
-    averaged_exp_data <- cbind(Gene = rownames(averaged_exp_data), averaged_exp_data)
-    fwrite(averaged_exp_data, file = out_file, sep = "\t", row.names = FALSE, quote = FALSE)
+    fwrite(averaged_exp_data, file = out_file, sep = "\t", row.names = TRUE, quote = FALSE)
 }

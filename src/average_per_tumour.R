@@ -3,7 +3,7 @@ required_libraries <- c("optparse",
                         )
 
 for (library in required_libraries) {
-    suppressPackageStartupMessages(library(library, character.only = TRUE, quietly = TRUE)))
+    suppressPackageStartupMessages(library(library, character.only = TRUE, quietly = TRUE))
 }
 
 ## Options

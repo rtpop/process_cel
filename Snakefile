@@ -80,6 +80,7 @@ BATCH_CORRECTION = config.get("batch_correction","")
 BATCH_METADATA_COLUMN = config.get("batch_metadata_column", "")
 ARRAY_TYPE = config.get("array_type", "")
 AVERAGE_BY_TUMOUR = config.get("average_by_tumour", "")
+TUMOUR_METADATA_COLUMN = config.get("tumour_metadata_column", "")
 
 ## helper functions ##
 # I don't know if this is the best way to do it
@@ -97,7 +98,17 @@ def get_all_inputs():
             PCA_PLOT_BATCH_CORRECTED
         ])
     
+    if AVERAGE_BY_TUMOUR:
+        inputs.append(EXP_FILE_FINAL)
+    
     return inputs
+
+def get_averaging_input():
+    """Get the correct input file for averaging based on whether batch correction is performed"""
+    if BATCH_CORRECTION:
+        return EXP_FILE_BATCH_CORRECTED
+    else:
+        return EXP_FILE_UNNORMALISED
 
 ## ----- ##
 ## Rules ##
@@ -245,18 +256,20 @@ if AVERAGE_BY_TUMOUR:
     rule average_per_tumour:
         input:
             exp_file = get_averaging_input(), \
-            metadata_file = METADATA_FILE
+            meta_file = METADATA_FILE
         output:
             exp_file_final = EXP_FILE_FINAL
         container: R_CONTAINER
         params:
-            script = os.path.join(SRC_DIR, "average_per_tumour.R")
+            script = os.path.join(SRC_DIR, "average_per_tumour.R"), \
+            tumour_col = TUMOUR_METADATA_COLUMN
         shell:
             """
             Rscript {params.script} \
                 --exp_file {input.exp_file} \
-                --metadata_file {input.metadata_file} \
-                --output_file {output.exp_file_final}
+                --meta_file {input.meta_file} \
+                --tumour_col {params.tumour_col} \
+                --out_file {output.exp_file_final}
             """
 
 

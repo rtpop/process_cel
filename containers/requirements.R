@@ -19,7 +19,8 @@ required_packages_cran <- c(
     "RColorBrewer",   # For color palettes for heatmaps
     "remotes",        # For installing local or GitHub packages
     "sessioninfo",    # For session information
-    "stringr"         # For string manipulation
+    "stringr",         # For string manipulation
+    "childsds"
     )
 
 install.packages(

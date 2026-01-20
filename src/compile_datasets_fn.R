@@ -19,7 +19,7 @@ compile_datasets <- function(datasets, output_file) {
     
     # Combine all datasets by column-binding them
     compiled_data <- cbind(data_list[[1]][, 1, drop = FALSE], do.call(cbind, lapply(data_list, function(x) x[, -1])))
-    colnames(compiled_data) <- str_sub(colnames(compiled_data), -8)
+    colnames(compiled_data) <- str_extract(colnames(compiled_data), "AUS2.*")
 
     # Write the compiled data to the output file
     fwrite(compiled_data, file = output_file, sep = "\t", na = "NA")

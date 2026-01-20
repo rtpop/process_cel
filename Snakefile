@@ -81,6 +81,7 @@ BATCH_METADATA_COLUMN = config.get("batch_metadata_column", "")
 ARRAY_TYPE = config.get("array_type", "")
 AVERAGE_BY_TUMOUR = config.get("average_by_tumour", "")
 TUMOUR_METADATA_COLUMN = config.get("tumour_metadata_column", "")
+EXP_FILE_AVG = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_avg"), "")
 
 ## helper functions ##
 # I don't know if this is the best way to do it
@@ -258,7 +259,7 @@ if AVERAGE_BY_TUMOUR:
             exp_file = get_averaging_input(), \
             meta_file = METADATA_FILE
         output:
-            exp_file_final = EXP_FILE_FINAL
+            exp_file_final = EXP_FILE_AVG
         container: R_CONTAINER
         params:
             script = os.path.join(SRC_DIR, "average_per_tumour.R"), \
@@ -274,20 +275,20 @@ if AVERAGE_BY_TUMOUR:
 
 
 
-# if NORMALISE:
-#     rule normalise_final_expression:
-#         input:
-#             exp_file = EXP_FILE_BATCH_CORRECTED
-#         output:
-#             exp_file_final = EXP_FILE_FINAL
-#         container: R_CONTAINER
-#         params:
-#             script = os.path.join(SRC_DIR, "normalise_final_expression.R"), \
-#             normalization_method = NORMALISATION_METHOD
-#         shell:
-#             """
-#             Rscript {params.script} \
-#                 --exp_file {input.exp_file} \
-#                 --normalization_method {params.normalization_method} \
-#                 --output_file {output.exp_file_final}
-#             """
+if NORMALISE:
+    rule normalise_final_expression:
+        input:
+            exp_file = EXP_FILE_AVG if AVERAGE_BY_TUMOUR else get_averaging_input()
+        output:
+            exp_file_final = EXP_FILE_FINAL
+        container: R_CONTAINER
+        params:
+            script = os.path.join(SRC_DIR, "normalise_final_expression.R"), \
+            normalization_method = NORMALISATION_METHOD
+        shell:
+            """
+            Rscript {params.script} \
+                --exp_file {input.exp_file} \
+                --normalization_method {params.normalization_method} \
+                --output_file {output.exp_file_final}
+            """

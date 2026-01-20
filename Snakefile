@@ -83,6 +83,10 @@ AVERAGE_BY_TUMOUR = config.get("average_by_tumour", "")
 TUMOUR_METADATA_COLUMN = config.get("tumour_metadata_column", "")
 EXP_FILE_AVG = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_avg"), "")
 
+MERGE_DATASETS = config.get("compile_datasets", "")
+DATASETS_TO_COMPILE = [os.path.join(PROCESSED_DATA_DIR, f) for f in config.get("datasets_to_compile", [])]
+EXP_FILE_MERGED = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_merged"), "")
+
 ## helper functions ##
 # I don't know if this is the best way to do it
 def get_all_inputs():
@@ -99,8 +103,16 @@ def get_all_inputs():
             PCA_PLOT_BATCH_CORRECTED
         ])
     
-    if AVERAGE_BY_TUMOUR:
+    if AVERAGE_BY_TUMOUR and NORMALISE:
+        inputs.append(EXP_FILE_AVG)
+    elif AVERAGE_BY_TUMOUR and not NORMALISE:
         inputs.append(EXP_FILE_FINAL)
+    
+    if NORMALISE and not AVERAGE_BY_TUMOUR:
+        inputs.append(EXP_FILE_FINAL)
+    
+    if MERGE_DATASETS:
+        inputs.append(EXP_FILE_MERGED)
     
     return inputs
 
@@ -242,24 +254,24 @@ if BATCH_CORRECTION:
             """
 
 if AVERAGE_BY_TUMOUR:
-    rule rename_batch_corrected_file:
-        """Changing the name of the batch corrected file to a temporary name before averaging so the normalisation rule works correctly
-        regardless of whether averaging is performed or not."""
-        input:
-            exp_file = get_averaging_input()
-        output:
-            exp_file_rename = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_preavg.txt")
-        shell:
-            """
-            cp {input.exp_file} {output.exp_file_rename}
-            """
+    # rule rename_batch_corrected_file:
+    #     """Changing the name of the batch corrected file to a temporary name before averaging so the normalisation rule works correctly
+    #     regardless of whether averaging is performed or not."""
+    #     input:
+    #         exp_file = get_averaging_input()
+    #     output:
+    #         exp_file_rename = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_preavg.txt")
+    #     shell:
+    #         """
+    #         cp {input.exp_file} {output.exp_file_rename}
+    #         """
 
     rule average_per_tumour:
         input:
             exp_file = get_averaging_input(), \
             meta_file = METADATA_FILE
         output:
-            exp_file_final = EXP_FILE_AVG
+            exp_file_final = EXP_FILE_AVG if NORMALISE else EXP_FILE_FINAL
         container: R_CONTAINER
         params:
             script = os.path.join(SRC_DIR, "average_per_tumour.R"), \
@@ -290,5 +302,22 @@ if NORMALISE:
             Rscript {params.script} \
                 --exp_file {input.exp_file} \
                 --normalization_method {params.normalization_method} \
+                --output_file {output.exp_file_final}
+            """
+
+if MERGE_DATASETS:
+    rule compile_datasets:
+        input:
+            datasets = expand(DATASETS_TO_COMPILE)
+        output:
+            exp_file_final = EXP_FILE_MERGED
+        container: R_CONTAINER
+        params:
+            script = os.path.join(SRC_DIR, "compile_datasets.R"), \
+            datasets_str = ",".join(DATASETS_TO_COMPILE)
+        shell:
+            """
+            Rscript {params.script} \
+                --datasets {params.datasets_str} \
                 --output_file {output.exp_file_final}
             """

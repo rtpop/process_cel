@@ -66,12 +66,13 @@ EXP_FILE_BATCH_CORRECTED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_bat
 EXP_FILE_FINAL = os.path.join(PROCESSED_DATA_DIR, config["exp_file_final"])
 
 # pca params
-PCA_PLOT = EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot_msi_top_1000_genes.pdf")
-PCA_PLOT_BATCH_CORRECTED = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot_msi_top_1000_genes.pdf")
+PCA_PLOT = EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot.pdf")
+PCA_PLOT_BATCH_CORRECTED = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot.pdf")
 TOP_N = config.get("top_n", "")
 N_PROBES = config.get("n_probes", "")
 
 ## Params
+PROCESS_CEL = config.get("processing_cel", "")
 FILE_SELECTION_METHOD = config.get("file_selection_method", "")
 NORMALISE = config.get("normalise", "")
 BACKGROUND_CORRECTION = config.get("background_correction","")
@@ -92,10 +93,12 @@ EXP_FILE_MERGED = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_merged")
 def get_all_inputs():
     """Get all required input files based on configuration"""
     inputs = [
-        RAW_DATA_FILES,
         EXP_FILE_UNNORMALISED,
-        PCA_PLOT
     ]
+
+    if PROCESS_CEL:
+        inputs.append(RAW_DATA_FILES)
+        inputs.append(PCA_PLOT)
     
     if BATCH_CORRECTION:
         inputs.extend([
@@ -131,80 +134,82 @@ rule all:
     input:
         get_all_inputs()
 
-rule select_cel_files:
-    input:
-        raw_data_dir = RAW_DATA_DIR, \
-        metadata_file = METADATA_FILE
-    output:
-        raw_data_files = RAW_DATA_FILES
-    container: R_CONTAINER
-    params:
-        script = os.path.join(SRC_DIR, "selecting_cel_files.R"), \
-        file_selection_method = FILE_SELECTION_METHOD, \
-        array_type = ARRAY_TYPE
-    shell:
-        """
-        Rscript {params.script} \
-            --raw_data_dir {input.raw_data_dir} \
-            --metadata_file {input.metadata_file} \
-            --file_selection_method {params.file_selection_method} \
-            --output_file {output.raw_data_files} \
-            --array_type {params.array_type}
-        """
 
-rule extract_expression_matrix:
-    input:
-        raw_data_dir = RAW_DATA_DIR, \
-        raw_data_files = RAW_DATA_FILES, \
-        metadata_file = METADATA_FILE
-    output:
-        exp_file = EXP_FILE_UNNORMALISED
-    container: R_CONTAINER
-    params:
-        script = os.path.join(SRC_DIR, "extract_expression_matrix.R"), \
-        normalise = NORMALISE, \
-        background_correction = BACKGROUND_CORRECTION, \
-        array_type = ARRAY_TYPE, \
-        anno_file = ANNO_FILE
-    shell:
-        """
-        Rscript {params.script} \
-            --raw_data_dir {input.raw_data_dir} \
-            --cel_files {input.raw_data_files} \
-            --normalise {params.normalise} \
-            --background {params.background_correction} \
-            --array_type {params.array_type} \
-            --anno_file {params.anno_file} \
-            --output_file {output.exp_file}
-        """
+if PROCESS_CEL:
+    rule select_cel_files:
+        input:
+            raw_data_dir = RAW_DATA_DIR, \
+            metadata_file = METADATA_FILE
+        output:
+            raw_data_files = RAW_DATA_FILES
+        container: R_CONTAINER
+        params:
+            script = os.path.join(SRC_DIR, "selecting_cel_files.R"), \
+            file_selection_method = FILE_SELECTION_METHOD, \
+            array_type = ARRAY_TYPE
+        shell:
+            """
+            Rscript {params.script} \
+                --raw_data_dir {input.raw_data_dir} \
+                --metadata_file {input.metadata_file} \
+                --file_selection_method {params.file_selection_method} \
+                --output_file {output.raw_data_files} \
+                --array_type {params.array_type}
+            """
 
-rule pca_plot:
-    input:
-        exp_file = EXP_FILE_UNNORMALISED, \
-        metadata_file = METADATA_FILE
-    output:
-        pca_plot = PCA_PLOT
-    container: R_CONTAINER
-    params:
-        script = os.path.join(SRC_DIR, "plot_pca.R"), \
-        color_by = config.get("pca_color_by", "") if config.get("pca_color_by") else "NULL", \
-        shape_by = config.get("pca_shape_by", "") if config.get("pca_shape_by") else "NULL", \
-        title = config.get("pca_title", ""), \
-        top_n = TOP_N, \
-        n_probes = N_PROBES
-        
-    shell:
-        """
-        Rscript {params.script} \
-            --exp_mat {input.exp_file} \
-            --metadata {input.metadata_file} \
-            --color_by {params.color_by} \
-            --shape_by {params.shape_by} \
-            --title "{params.title}" \
-            --output_file {output.pca_plot} \
-            --top_n {params.top_n} \
-            --n_probes {params.n_probes}
-        """
+    rule extract_expression_matrix:
+        input:
+            raw_data_dir = RAW_DATA_DIR, \
+            raw_data_files = RAW_DATA_FILES, \
+            metadata_file = METADATA_FILE
+        output:
+            exp_file = EXP_FILE_UNNORMALISED
+        container: R_CONTAINER
+        params:
+            script = os.path.join(SRC_DIR, "extract_expression_matrix.R"), \
+            normalise = NORMALISE, \
+            background_correction = BACKGROUND_CORRECTION, \
+            array_type = ARRAY_TYPE, \
+            anno_file = ANNO_FILE
+        shell:
+            """
+            Rscript {params.script} \
+                --raw_data_dir {input.raw_data_dir} \
+                --cel_files {input.raw_data_files} \
+                --normalise {params.normalise} \
+                --background {params.background_correction} \
+                --array_type {params.array_type} \
+                --anno_file {params.anno_file} \
+                --output_file {output.exp_file}
+            """
+
+    rule pca_plot:
+        input:
+            exp_file = EXP_FILE_UNNORMALISED, \
+            metadata_file = METADATA_FILE
+        output:
+            pca_plot = PCA_PLOT
+        container: R_CONTAINER
+        params:
+            script = os.path.join(SRC_DIR, "plot_pca.R"), \
+            color_by = config.get("pca_color_by", "") if config.get("pca_color_by") else "NULL", \
+            shape_by = config.get("pca_shape_by", "") if config.get("pca_shape_by") else "NULL", \
+            title = config.get("pca_title", ""), \
+            top_n = TOP_N, \
+            n_probes = N_PROBES
+            
+        shell:
+            """
+            Rscript {params.script} \
+                --exp_mat {input.exp_file} \
+                --metadata {input.metadata_file} \
+                --color_by {params.color_by} \
+                --shape_by {params.shape_by} \
+                --title "{params.title}" \
+                --output_file {output.pca_plot} \
+                --top_n {params.top_n} \
+                --n_probes {params.n_probes}
+            """
 
 if BATCH_CORRECTION:
     rule combat_batch_correction:

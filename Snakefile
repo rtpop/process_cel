@@ -34,7 +34,7 @@ import time
 
 # config file
 global CONFIG_PATH
-CONFIG_PATH = "config_multi_region.yaml"
+CONFIG_PATH = "config_matched.yaml"
 configfile: CONFIG_PATH
 
 # Containers
@@ -82,11 +82,13 @@ BATCH_METADATA_COLUMN = config.get("batch_metadata_column", "")
 ARRAY_TYPE = config.get("array_type", "")
 AVERAGE_BY_TUMOUR = config.get("average_by_tumour", "")
 TUMOUR_METADATA_COLUMN = config.get("tumour_metadata_column", "")
-EXP_FILE_AVG = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_avg"), "")
+EXP_FILE_AVG = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_avg", "exp_avg_by_tumour.txt"))
 
 MERGE_DATASETS = config.get("compile_datasets", "")
-DATASETS_TO_COMPILE = [os.path.join(PROCESSED_DATA_DIR, f) for f in config.get("datasets_to_compile", [])]
-EXP_FILE_MERGED = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_merged"), "")
+if MERGE_DATASETS:
+    print("Datasets to compile:", config.get("datasets_to_compile", []))
+    DATASETS_TO_COMPILE = [os.path.join(PROCESSED_DATA_DIR, f) for f in config.get("datasets_to_compile", [])]
+    EXP_FILE_MERGED = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_merged"), "")
 
 ## helper functions ##
 # I don't know if this is the best way to do it
@@ -170,7 +172,8 @@ if PROCESS_CEL:
             normalise = NORMALISE, \
             background_correction = BACKGROUND_CORRECTION, \
             array_type = ARRAY_TYPE, \
-            anno_file = ANNO_FILE
+            anno_file = ANNO_FILE, \
+            tumour_metadata_column = TUMOUR_METADATA_COLUMN
         shell:
             """
             Rscript {params.script} \
@@ -180,7 +183,8 @@ if PROCESS_CEL:
                 --background {params.background_correction} \
                 --array_type {params.array_type} \
                 --anno_file {params.anno_file} \
-                --output_file {output.exp_file}
+                --output_file {output.exp_file} \
+                --tumour_metadata_column {params.tumour_metadata_column}
             """
 
     rule pca_plot:

@@ -61,7 +61,6 @@ METADATA_FILE = os.path.join(DATA_DIR, config.get("metadata_file", ""))
 RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, config.get("raw_data_files", ""))
 
 EXP_FILE_UNNORMALISED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_unnormalised"])
-ANNO_FILE = os.path.join(PROCESSED_DATA_DIR, config["annotation_file"])
 EXP_FILE_BATCH_CORRECTED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_batch_corrected"])
 EXP_FILE_FINAL = os.path.join(PROCESSED_DATA_DIR, config["exp_file_final"])
 
@@ -148,7 +147,8 @@ if PROCESS_CEL:
         params:
             script = os.path.join(SRC_DIR, "selecting_cel_files.R"), \
             file_selection_method = FILE_SELECTION_METHOD, \
-            array_type = ARRAY_TYPE
+            array_type = ARRAY_TYPE, \
+            tumour_metadata_column = TUMOUR_METADATA_COLUMN
         shell:
             """
             Rscript {params.script} \
@@ -156,7 +156,8 @@ if PROCESS_CEL:
                 --metadata_file {input.metadata_file} \
                 --file_selection_method {params.file_selection_method} \
                 --output_file {output.raw_data_files} \
-                --array_type {params.array_type}
+                --array_type {params.array_type} \
+                --tumour_metadata_column {params.tumour_metadata_column}
             """
 
     rule extract_expression_matrix:
@@ -172,7 +173,6 @@ if PROCESS_CEL:
             normalise = NORMALISE, \
             background_correction = BACKGROUND_CORRECTION, \
             array_type = ARRAY_TYPE, \
-            anno_file = ANNO_FILE, \
             tumour_metadata_column = TUMOUR_METADATA_COLUMN
         shell:
             """
@@ -182,7 +182,6 @@ if PROCESS_CEL:
                 --normalise {params.normalise} \
                 --background {params.background_correction} \
                 --array_type {params.array_type} \
-                --anno_file {params.anno_file} \
                 --output_file {output.exp_file} \
                 --tumour_metadata_column {params.tumour_metadata_column}
             """

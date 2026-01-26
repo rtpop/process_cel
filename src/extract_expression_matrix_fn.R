@@ -28,7 +28,7 @@ extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, norm
     exp <- exprs(data)
     
     # annotate expression matrix
-    anno <- annotate_expression_matrix(exp, files_metadata, tumour_metadata_column, anno_file)
+    anno <- annotate_expression_matrix(exp, files_metadata, tumour_metadata_column)
 
     # save expression matrix
     fwrite(as.data.frame(anno), file = output_file, sep = "\t", row.names = TRUE)
@@ -44,11 +44,12 @@ extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, norm
 #' @return A data frame with the annotated expression matrix, including gene names and Ensembl IDs.
 
 
-annotate_expression_matrix <- function(expression_matrix, files_metadata, tumour_metadata_column, anno_file = "annotation.txt") {
+annotate_expression_matrix <- function(expression_matrix, files_metadata, tumour_metadata_column) {
     bm_filter <- "entrezgene_id"
-    
+
     # rename columns to tumour ids
-    colnames(expression_matrix) <- files_metadata[[tumour_metadata_column]][match(colnames(expression_matrix), files_metadata$file_name)]
+    colnames(expression_matrix) <- files_metadata$tumour_id[match(colnames(expression_matrix), files_metadata$file_name)]
+
     # remove tag from probe ids
     rownames(expression_matrix) <- gsub("_at$", "", rownames(expression_matrix))
 

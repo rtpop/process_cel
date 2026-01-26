@@ -55,9 +55,9 @@ n_probes: 1000 # number of most variable probes to use if top_n is TRUE
 ## Output files ##
 ## ------------ ##
 
-exp_file_unnormalised: "compiled_exp_final.txt"
+exp_file_unnormalised: "compiled_exp.txt"
 exp_file_batch_corrected: "compiled_exp_batch_corrected.txt"
 exp_file_avg: "hta_all_exp_avg_by_tumour.txt"
-exp_file_final: "hta_all_exp_final.txt"
+exp_file_final: "compiled_exp_normalised.txt"
 annotation_file: "hta_annotation_reanno.txt"
-exp_file_merged: "compiled_exp_final.txt"
+exp_file_merged: "compiled_exp.txt"

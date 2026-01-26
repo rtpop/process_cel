@@ -1,7 +1,7 @@
 ## ---------- ##
 ## Containers ##
 ## ---------- ##
-r_container: "docker://rtpop/process_cel:0.1"
+r_container: "docker://rtpop/process_cel:0.9"
 
 ## Number of cores
 ncores: 30
@@ -20,6 +20,7 @@ run_tag: "matched"
 ## Input files ##
 ## ----------- ##
 metadata_file: "matched_microarray_metadata.csv"
+raw_data_files: "matched_raw_data_files.txt" # text file with list of raw data files (CEL files) to process (one file per line)
 
 ## ----------------- ##
 ## Processing params ##
@@ -28,9 +29,9 @@ metadata_file: "matched_microarray_metadata.csv"
 # Which files to select for processing
 # in case different batches of files need different processing (i.e. different batch correction, etc)
 # options: "all", "multi_region", "single_region"
-
+processing_cel: true
 file_selection_method: "all" # all | multi_region | single_region
-normal_samples: TRUE # whether to include normal samples in the processing
+normal_samples: FALSE # whether to include normal samples in the processing
 array_type: "hta20" # type of array: supported: hta20 | huex10 (case insensitive)
 batch_correction: FALSE # whether to perform batch correction
 batch_metadata_column: "" # column name in the metadata file indicating batches
@@ -41,11 +42,14 @@ normalization_method: "quantile" # method for normalization
 average_by_tumour: TRUE # whether to average expression values by tumour
 compile_datasets: FALSE # whether to compile multiple datasets into a single expression matrix
 datasets_to_compile: [] # list of filenames of datasets to compile if compile_datasets is TRUE. These should be in processed_data_dir
+tumour_metadata_column: HTA_sample_file_name # column name in the metadata file indicating tumour IDs for averaging
 
 ## PCA params ##
 pca_color_by: "Tissue" # column name in the metadata file to color points by
 pca_shape_by: NULL # column name in the metadata file to shape points by
 pca_title: "PCA of Matched Samples" # title of the PCA plot
+top_n: FALSE
+n_probes: 1000
 
 ## ------------ ##
 ## Output files ##
@@ -54,4 +58,4 @@ pca_title: "PCA of Matched Samples" # title of the PCA plot
 exp_file_unnormalised: "matched_exp_all_smpl.txt"
 exp_file_batch_corrected: "matched_exp_batch_corrected.txt"
 exp_file_final: "matched_exp_final.txt"
-annotation_file: "hta20_annotation.txt"
+exp_file_avg: "matched_exp_avg_by_tumour.txt"

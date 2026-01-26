@@ -28,12 +28,12 @@ metadata_file: "all_primary_samples_msi.csv"
 # Which files to select for processing
 # in case different batches of files need different processing (i.e. different batch correction, etc)
 # options: "all", "multi_region", "single_region"
-processing_cel: FALSE # whether to process raw CEL files
+processing_cel: TRUE # whether to process raw CEL files
 file_selection_method: "all" # all | multi_region | single_region
 normal_samples: false # whether to include normal samples in the processing
 array_type: "hta20" # type of array: supported: hta20 | huex10 (case insensitive)
 batch_correction: TRUE # whether to perform batch correction
-batch_metadata_column: "Array" # column name in the metadata file indicating batches
+batch_metadata_column: "Batch_by_Lot" # column name in the metadata file indicating batches
 normalise: TRUE # whether to normalise the data
 background_correction: TRUE # whether to perform background correction
 background_correction_method: "rma" # method for background correction
@@ -41,13 +41,13 @@ normalization_method: "quantile" # method for normalization
 average_by_tumour: FALSE # whether to average expression values by tumour
 tumour_metadata_column: "Tumor_ID" # column name in the metadata file indicating tumour IDs
 compile_datasets: FALSE # whether to compile multiple datasets into a single expression matrix
-datasets_to_compile: ["hta_all_exp_final.txt", "huex_all_exp_unnormalised.txt"] # list of filenames of datasets to compile if compile_datasets is TRUE. These should be in processed_data_dir
+datasets_to_compile: ["hta_all_exp_final.txt", "huex_all_exp.txt"] # list of filenames of datasets to compile if compile_datasets is TRUE. These should be in processed_data_dir
 raw_data_files: "files_to_process_hta.txt" # text file with list of raw data files to process (one file per line)
 
 ## PCA params ##
-pca_color_by: "Array" # column name in the metadata file to color points by
+pca_color_by: "Batch_by_Lot" # column name in the metadata file to color points by
 pca_shape_by: NULL # column name in the metadata file to shape points by
-pca_title: "PCA of hta + huex merged data" # title of the PCA plot
+pca_title: "PCA of hta single + multi-region" # title of the PCA plot
 top_n: FALSE # whether to use top N most variable probes for PCA
 n_probes: 1000 # number of most variable probes to use if top_n is TRUE
 
@@ -55,9 +55,8 @@ n_probes: 1000 # number of most variable probes to use if top_n is TRUE
 ## Output files ##
 ## ------------ ##
 
-exp_file_unnormalised: "compiled_exp.txt"
-exp_file_batch_corrected: "compiled_exp_batch_corrected.txt"
+exp_file: "hta_exp.txt"
+exp_file_batch_corrected: "hta_all_exp_batch_corrected.txt"
 exp_file_avg: "hta_all_exp_avg_by_tumour.txt"
-exp_file_final: "compiled_exp_normalised.txt"
-annotation_file: "hta_annotation_reanno.txt"
-exp_file_merged: "compiled_exp.txt"
+exp_file_final: "hta_all_exp_final.txt"
+exp_file_merged: "hta_all_exp.txt"

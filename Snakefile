@@ -34,7 +34,7 @@ import time
 
 # config file
 global CONFIG_PATH
-CONFIG_PATH = "config_matched.yaml"
+CONFIG_PATH = "config_multi_region.yaml"
 configfile: CONFIG_PATH
 
 # Containers
@@ -60,7 +60,7 @@ METADATA_FILE = os.path.join(DATA_DIR, config.get("metadata_file", ""))
 ## Intermediate files
 RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, config.get("raw_data_files", ""))
 
-EXP_FILE_UNNORMALISED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_unnormalised"])
+EXP_FILE_UNNORMALISED = os.path.join(PROCESSED_DATA_DIR, config["exp_file"])
 EXP_FILE_BATCH_CORRECTED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_batch_corrected"])
 EXP_FILE_FINAL = os.path.join(PROCESSED_DATA_DIR, config["exp_file_final"])
 
@@ -107,13 +107,8 @@ def get_all_inputs():
             PCA_PLOT_BATCH_CORRECTED
         ])
     
-    if AVERAGE_BY_TUMOUR and NORMALISE:
+    if AVERAGE_BY_TUMOUR:
         inputs.append(EXP_FILE_AVG)
-    elif AVERAGE_BY_TUMOUR and not NORMALISE:
-        inputs.append(EXP_FILE_FINAL)
-    
-    if NORMALISE and not AVERAGE_BY_TUMOUR:
-        inputs.append(EXP_FILE_FINAL)
     
     if MERGE_DATASETS:
         inputs.append(EXP_FILE_MERGED)
@@ -291,26 +286,6 @@ if AVERAGE_BY_TUMOUR:
                 --meta_file {input.meta_file} \
                 --tumour_col {params.tumour_col} \
                 --out_file {output.exp_file_final}
-            """
-
-
-
-if NORMALISE:
-    rule normalise_final_expression:
-        input:
-            exp_file = EXP_FILE_AVG if AVERAGE_BY_TUMOUR else get_averaging_input()
-        output:
-            exp_file_final = EXP_FILE_FINAL
-        container: R_CONTAINER
-        params:
-            script = os.path.join(SRC_DIR, "normalise_final_expression.R"), \
-            normalization_method = NORMALISATION_METHOD
-        shell:
-            """
-            Rscript {params.script} \
-                --exp_file {input.exp_file} \
-                --normalization_method {params.normalization_method} \
-                --output_file {output.exp_file_final}
             """
 
 if MERGE_DATASETS:

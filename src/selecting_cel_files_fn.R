@@ -8,7 +8,7 @@
 #' @param normal Logical indicating whether to also include normal samples.
 #' @param output_file Path to the output file where selected CEL
 
-select_cel_files <- function(raw_data_dir, metadata_file, file_selection_method = "all", array_type = "hta20", normal = TRUE, output_file) {
+select_cel_files <- function(raw_data_dir, metadata_file, tumour_metadata_column, file_selection_method = "all", array_type = "hta20", normal = TRUE, output_file) {
     # Load metadata
     metadata <- read.csv(metadata_file, stringsAsFactors = FALSE)
     
@@ -35,15 +35,15 @@ select_cel_files <- function(raw_data_dir, metadata_file, file_selection_method 
 
     if (file_selection_method == "all") {
         cel_files <- data.frame(file_name = filtered_metadata$HTA_sample_file_name, 
-                                tumour_id = filtered_metadata$Tumor_ID,
+                                tumour_id = filtered_metadata[[tumour_metadata_column]],
                                 stringsAsFactors = FALSE)
     } else if (file_selection_method == "multi_region") {
         cel_files <- data.frame(file_name = filtered_metadata$HTA_sample_file_name[which(filtered_metadata$Multiregion == TRUE)], 
-                                tumour_id = filtered_metadata$Tumor_ID[which(filtered_metadata$Multiregion == TRUE)],
+                                tumour_id = filtered_metadata[[tumour_metadata_column]][which(filtered_metadata$Multiregion == TRUE)],
                                 stringsAsFactors = FALSE)
     } else if (file_selection_method == "single_region") {
         cel_files <- data.frame(file_name = filtered_metadata$HTA_sample_file_name[which(filtered_metadata$Multiregion == FALSE)], 
-                                tumour_id = filtered_metadata$Tumor_ID[which(filtered_metadata$Multiregion == FALSE)],
+                                tumour_id = filtered_metadata[[tumour_metadata_column]][which(filtered_metadata$Multiregion == FALSE)],
                                 stringsAsFactors = FALSE)
     } else {
         stop("Invalid file selection method.")
@@ -51,7 +51,7 @@ select_cel_files <- function(raw_data_dir, metadata_file, file_selection_method 
 
     if (normal) {
         normal_cel_files <- data.frame(file_name = filtered_metadata$HTA_sample_file_name[which(filtered_metadata$Tissue_type == "Normal_mucosa")], 
-                                       tumour_id = filtered_metadata$Tumor_ID[which(filtered_metadata$Tissue_type == "Normal_mucosa")],
+                                       tumour_id = filtered_metadata[[tumour_metadata_column]][which(filtered_metadata$Tissue_type == "Normal_mucosa")],
                                        stringsAsFactors = FALSE)
         cel_files <- unique(rbind(cel_files, normal_cel_files))
     }

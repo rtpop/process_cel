@@ -34,7 +34,7 @@ import time
 
 # config file
 global CONFIG_PATH
-CONFIG_PATH = "config_multi_region.yaml"
+CONFIG_PATH = "config_merged.yaml"
 configfile: CONFIG_PATH
 
 # Containers
@@ -60,12 +60,12 @@ METADATA_FILE = os.path.join(DATA_DIR, config.get("metadata_file", ""))
 ## Intermediate files
 RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, config.get("raw_data_files", ""))
 
-EXP_FILE_UNNORMALISED = os.path.join(PROCESSED_DATA_DIR, config["exp_file"])
+EXP_FILE = os.path.join(PROCESSED_DATA_DIR, config["exp_file"])
 EXP_FILE_BATCH_CORRECTED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_batch_corrected"])
 EXP_FILE_FINAL = os.path.join(PROCESSED_DATA_DIR, config["exp_file_final"])
 
 # pca params
-PCA_PLOT = EXP_FILE_UNNORMALISED.replace(".txt", "_PCA_plot.pdf")
+PCA_PLOT = EXP_FILE.replace(".txt", "_PCA_plot.pdf")
 PCA_PLOT_BATCH_CORRECTED = EXP_FILE_BATCH_CORRECTED.replace(".txt", "_PCA_plot.pdf")
 TOP_N = config.get("top_n", "")
 N_PROBES = config.get("n_probes", "")
@@ -87,19 +87,20 @@ MERGE_DATASETS = config.get("compile_datasets", "")
 if MERGE_DATASETS:
     print("Datasets to compile:", config.get("datasets_to_compile", []))
     DATASETS_TO_COMPILE = [os.path.join(PROCESSED_DATA_DIR, f) for f in config.get("datasets_to_compile", [])]
-    EXP_FILE_MERGED = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_merged"), "")
+    EXP_FILE_MERGED = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_merged", ""))
 
 ## helper functions ##
 # I don't know if this is the best way to do it
 def get_all_inputs():
     """Get all required input files based on configuration"""
-    inputs = [
-        EXP_FILE_UNNORMALISED,
-    ]
+    inputs = []
 
     if PROCESS_CEL:
-        inputs.append(RAW_DATA_FILES)
-        inputs.append(PCA_PLOT)
+        inputs.extend([
+            RAW_DATA_FILES,
+            EXP_FILE,
+            PCA_PLOT
+        ])
     
     if BATCH_CORRECTION:
         inputs.extend([
@@ -120,7 +121,7 @@ def get_averaging_input():
     if BATCH_CORRECTION:
         return EXP_FILE_BATCH_CORRECTED
     else:
-        return EXP_FILE_UNNORMALISED
+        return EXP_FILE
 
 ## ----- ##
 ## Rules ##
@@ -161,7 +162,7 @@ if PROCESS_CEL:
             raw_data_files = RAW_DATA_FILES, \
             metadata_file = METADATA_FILE
         output:
-            exp_file = EXP_FILE_UNNORMALISED
+            exp_file = EXP_FILE
         container: R_CONTAINER
         params:
             script = os.path.join(SRC_DIR, "extract_expression_matrix.R"), \
@@ -183,7 +184,7 @@ if PROCESS_CEL:
 
     rule pca_plot:
         input:
-            exp_file = EXP_FILE_UNNORMALISED, \
+            exp_file = EXP_FILE, \
             metadata_file = METADATA_FILE
         output:
             pca_plot = PCA_PLOT
@@ -212,7 +213,7 @@ if PROCESS_CEL:
 if BATCH_CORRECTION:
     rule combat_batch_correction:
         input:
-            exp_file = EXP_FILE_UNNORMALISED, \
+            exp_file = EXP_FILE, \
             metadata_file = METADATA_FILE
         output:
             exp_file_corrected = EXP_FILE_BATCH_CORRECTED
@@ -274,7 +275,7 @@ if AVERAGE_BY_TUMOUR:
             exp_file = get_averaging_input(), \
             meta_file = METADATA_FILE
         output:
-            exp_file_final = EXP_FILE_AVG if NORMALISE else EXP_FILE_FINAL
+            exp_file_final = EXP_FILE_AVG
         container: R_CONTAINER
         params:
             script = os.path.join(SRC_DIR, "average_per_tumour.R"), \
@@ -293,7 +294,7 @@ if MERGE_DATASETS:
         input:
             datasets = expand(DATASETS_TO_COMPILE)
         output:
-            exp_file_final = EXP_FILE_MERGED
+            exp_file_final = EXP_FILE
         container: R_CONTAINER
         params:
             script = os.path.join(SRC_DIR, "compile_datasets.R"), \
@@ -304,3 +305,5 @@ if MERGE_DATASETS:
                 --datasets {params.datasets_str} \
                 --output_file {output.exp_file_final}
             """
+
+    

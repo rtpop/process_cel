@@ -19,7 +19,7 @@ run_tag: "multiregion"
 ## ----------- ##
 ## Input files ##
 ## ----------- ##
-metadata_file: "all_primary_samples.csv"
+metadata_file: "all_primary_samples_msi.csv"
 
 ## ----------------- ##
 ## Processing params ##
@@ -28,13 +28,13 @@ metadata_file: "all_primary_samples.csv"
 # Which files to select for processing
 # in case different batches of files need different processing (i.e. different batch correction, etc)
 # options: "all", "multi_region", "single_region"
-
+processing_cel: TRUE
 file_selection_method: "all" # all | multi_region | single_region
 normal_samples: false # whether to include normal samples in the processing
 array_type: "huex10" # type of array: supported: hta20 | huex10 (case insensitive)
 batch_correction: FALSE # whether to perform batch correction
 batch_metadata_column: "Batch_by_Lot" # column name in the metadata file indicating batches
-normalise: FALSE # whether to normalise the data
+normalise: TRUE # whether to normalise the data
 background_correction: TRUE # whether to perform background correction
 background_correction_method: "rma" # method for background correction
 normalization_method: "quantile" # method for normalization
@@ -42,17 +42,20 @@ average_by_tumour: FALSE # whether to average expression values by tumour
 compile_datasets: FALSE # whether to compile multiple datasets into a single expression matrix
 datasets_to_compile: [] # list of filenames of datasets to compile if compile_datasets is TRUE. These should be in processed_data_dir
 raw_data_files: "files_to_process_huex.txt" # text file with list of raw data files to process (one file per line)
+tumour_metadata_column: "Tumor_ID" # column name in the metadata file indicating tumour IDs
 
 ## PCA params ##
-pca_color_by: "Batch_by_Lot" # column name in the metadata file to color points by
+pca_color_by: "MSI_Status" # column name in the metadata file to color points by
 pca_shape_by: NULL # column name in the metadata file to shape points by
 pca_title: "PCA of Huex Samples" # title of the PCA plot
+top_n: FALSE # whether to select top N most variable genes for PCA
+n_probes: 1000 # number of most variable probes to use if top_n is TRUE
 
 ## ------------ ##
 ## Output files ##
 ## ------------ ##
 
-exp_file_unnormalised: "huex_all_exp_unnormalised.txt"
+exp_file: "huex_all_exp.txt"
 exp_file_batch_corrected: "huex_all_exp_batch_corrected.txt"
 exp_file_final: "huex_all_exp_final.txt"
 annotation_file: "huex10_annotation_reanno.txt"

@@ -18,7 +18,7 @@ opt <- list(
     snakemake@params[["array_type"]],
     snakemake@params[["tumour_metadata_column"]],
     snakemake@params[["normal_samples"]],
-    snakemake@output[["output_file"]],
+    snakemake@output[["output_file"]]
 )
 
 ## Source functions

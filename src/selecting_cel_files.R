@@ -1,4 +1,4 @@
-required_libraries <- c("optparse")
+required_libraries <- c()
 
 for (library in required_libraries) {
     suppressPackageStartupMessages(library(library, character.only = TRUE, quietly = TRUE))
@@ -11,25 +11,15 @@ options(stringsAsFactors = FALSE)
 ## Parse arguments ##
 ## --------------- ##
 
-option_list <- list(
-    make_option(c("--raw_data_dir"), type = "character", default = "data/raw",
-                help = "Directory containing raw data files"),
-    make_option(c("--metadata_file"), type = "character", default = "metadata.csv",
-                help = "Metadata file"),
-    make_option(c("--file_selection_method"), type = "character", default = "all",
-                help = "File selection method: all, multi_region, single_region"),
-    make_option(c("--output_file"), type = "character", default = "selected_files.txt",
-                help = "Output file for selected CEL files"),
-    make_option(c("--array_type"), type = "character", default = "hta20",
-                help = "Type of array: hta20 or huex10"),
-    make_option(c("--tumour_metadata_column"), type = "character", default = "Tumor_ID",
-                help = "Column name in metadata file for tumour IDs"),
-    make_option(c("--normal"), type = "logical", default = TRUE,
-                help = "Include normal samples or not")
+opt <- list(
+    snakemake@input[["raw_data_dir"]],
+    snakemake@input[["metadata_file"]],
+    snakemake@params[["file_selection_method"]],
+    snakemake@params[["array_type"]],
+    snakemake@params[["tumour_metadata_column"]],
+    snakemake@params[["normal_samples"]],
+    snakemake@output[["output_file"]],
 )
-
-opt_parser <- OptionParser(option_list = option_list)
-opt <- parse_args(opt_parser)
 
 ## Source functions
 source("src/selecting_cel_files_fn.R")

@@ -145,16 +145,8 @@ if PROCESS_CEL:
             array_type = ARRAY_TYPE, \
             tumour_metadata_column = TUMOUR_METADATA_COLUMN, \
             normal_samples = NORMAL_SAMPLES
-        shell:
-            """
-            Rscript {params.script} \
-                --raw_data_dir {input.raw_data_dir} \
-                --metadata_file {input.metadata_file} \
-                --file_selection_method {params.file_selection_method} \
-                --output_file {output.raw_data_files} \
-                --array_type {params.array_type} \
-                --tumour_metadata_column {params.tumour_metadata_column}
-            """
+        script:
+            "{params.script}"
 
     rule extract_expression_matrix:
         input:
@@ -168,17 +160,10 @@ if PROCESS_CEL:
             script = os.path.join(SRC_DIR, "extract_expression_matrix.R"), \
             normalise = NORMALISE, \
             array_type = ARRAY_TYPE, \
-            tumour_metadata_column = TUMOUR_METADATA_COLUMN
-        shell:
-            """
-            Rscript {params.script} \
-                --raw_data_dir {input.raw_data_dir} \
-                --cel_files {input.raw_data_files} \
-                --normalise {params.normalise} \
-                --array_type {params.array_type} \
-                --output_file {output.exp_file} \
-                --tumour_metadata_column {params.tumour_metadata_column}
-            """
+            tumour_metadata_column = TUMOUR_METADATA_COLUMN, \
+            normal_samples = NORMAL_SAMPLES
+        script:
+            "{params.script}"
 
     rule pca_plot:
         input:

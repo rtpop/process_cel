@@ -73,15 +73,15 @@ N_PROBES = config.get("n_probes", "")
 ## Params
 PROCESS_CEL = config.get("processing_cel", "")
 FILE_SELECTION_METHOD = config.get("file_selection_method", "")
-NORMALISE = config.get("normalise", TRUE)
-BATCH_CORRECTION = config.get("batch_correction",FALSE)
+NORMALISE = config.get("normalise", True)
+BATCH_CORRECTION = config.get("batch_correction", False)
 BATCH_METADATA_COLUMN = config.get("batch_metadata_column", "")
 ARRAY_TYPE = config.get("array_type", "")
 AVERAGE_BY_TUMOUR = config.get("average_by_tumour", "")
 TUMOUR_METADATA_COLUMN = config.get("tumour_metadata_column", "")
 EXP_FILE_AVG = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_avg", "exp_avg_by_tumour.txt"))
 
-MERGE_DATASETS = config.get("compile_datasets", FALSE)
+MERGE_DATASETS = config.get("compile_datasets", False)
 if MERGE_DATASETS:
     print("Datasets to compile:", config.get("datasets_to_compile", []))
     DATASETS_TO_COMPILE = [os.path.join(PROCESSED_DATA_DIR, f) for f in config.get("datasets_to_compile", [])]

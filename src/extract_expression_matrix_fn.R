@@ -9,7 +9,7 @@
 #' @param array_type A character string specifying the type of array.
 #' @return None. The function saves the expression matrix to the specified output file.
 
-extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, normalise=FALSE, background=TRUE, array_type, anno_file = "annotation.txt") {
+extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, normalise=TRUE, background=TRUE, array_type, tumour_metadata_column, anno_file) {
     # read cel files
     files_metadata <- fread(cel_files, stringsAsFactors = FALSE)
     files <- as.vector(files_metadata[[1]])
@@ -19,7 +19,7 @@ extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, norm
     if (array_type == "hta20") {
         cdfname = "hta20_Hs_ENTREZG"
     } else if (array_type == "huex10") {
-        cdfname = "huex10_Hs_ENTREZG"
+        cdfname = "huex10_St_Hs_ENTREZG"
     } else {
         stop(paste0("Array type ", array_type, " not supported."))
     }
@@ -28,7 +28,7 @@ extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, norm
     exp <- exprs(data)
     
     # annotate expression matrix
-    anno <- annotate_expression_matrix(exp, files_metadata, anno_file)
+    anno <- annotate_expression_matrix(exp, files_metadata, tumour_metadata_column)
 
     # save expression matrix
     fwrite(as.data.frame(anno), file = output_file, sep = "\t", row.names = TRUE)
@@ -44,9 +44,9 @@ extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, norm
 #' @return A data frame with the annotated expression matrix, including gene names and Ensembl IDs.
 
 
-annotate_expression_matrix <- function(expression_matrix, files_metadata, anno_file = "annotation.txt") {
+annotate_expression_matrix <- function(expression_matrix, files_metadata, tumour_metadata_column) {
     bm_filter <- "entrezgene_id"
-    
+
     # rename columns to tumour ids
     colnames(expression_matrix) <- files_metadata$tumour_id[match(colnames(expression_matrix), files_metadata$file_name)]
 
@@ -54,7 +54,7 @@ annotate_expression_matrix <- function(expression_matrix, files_metadata, anno_f
     rownames(expression_matrix) <- gsub("_at$", "", rownames(expression_matrix))
 
     # annotate genes
-    mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
+    mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl", host="https://useast.ensembl.org")
     annotations <- getBM(
         attributes = c("entrezgene_id", "hgnc_symbol"),
         filters = "entrezgene_id", 
@@ -73,9 +73,9 @@ annotate_expression_matrix <- function(expression_matrix, files_metadata, anno_f
     gene_names <- expression_matrix$gene_name
 
     # average by gene name
-    expression_matrix <- aggregate(. ~ gene_name, data = expression_matrix, FUN = mean, na.rm = TRUE)
-    rownames(expression_matrix) <- expression_matrix$gene_name
-    expression_matrix <- expression_matrix[, -1]
+    expression_matrix_split <- split(expression_matrix[, -ncol(expression_matrix)], gene_names)
+    expression_matrix <- do.call(rbind, lapply(expression_matrix_split, function(x) colMeans(x)))
+    rownames(expression_matrix) <- names(expression_matrix_split)
 
     return(expression_matrix)
 }

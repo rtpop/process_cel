@@ -22,6 +22,7 @@ opt <- list(
     snakemake@output[["output_file"]]
 )
 
+message("DEBUG: opt structure:")
 str(opt)
 
 ## --------- ##

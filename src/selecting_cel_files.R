@@ -23,7 +23,9 @@ option_list <- list(
     make_option(c("--array_type"), type = "character", default = "hta20",
                 help = "Type of array: hta20 or huex10"),
     make_option(c("--tumour_metadata_column"), type = "character", default = "Tumor_ID",
-                help = "Column name in metadata file for tumour IDs")
+                help = "Column name in metadata file for tumour IDs"),
+    make_option(c("--normal"), type = "logical", default = TRUE,
+                help = "Include normal samples or not")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -38,5 +40,6 @@ select_cel_files(
     file_selection_method = opt$file_selection_method,
     output_file = opt$output_file,
     array_type = opt$array_type,
-    tumour_metadata_column = opt$tumour_metadata_column
+    tumour_metadata_column = opt$tumour_metadata_column,
+    normal = opt$normal
 )

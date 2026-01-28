@@ -49,11 +49,13 @@ select_cel_files <- function(raw_data_dir, metadata_file, tumour_metadata_column
         stop("Invalid file selection method.")
     }
 
-    if (normal) {
-        normal_cel_files <- data.frame(file_name = filtered_metadata$HTA_sample_file_name[which(filtered_metadata$Tissue_type == "Normal_mucosa")], 
-                                       tumour_id = filtered_metadata[[tumour_metadata_column]][which(filtered_metadata$Tissue_type == "Normal_mucosa")],
-                                       stringsAsFactors = FALSE)
-        cel_files <- unique(rbind(cel_files, normal_cel_files))
+    if (!normal) {
+    keep_idx <- !grepl(
+        "norm",
+        filtered_metadata$Tissue[match(cel_files$file_name, filtered_metadata$HTA_sample_file_name)],
+        ignore.case = TRUE
+    )
+    cel_files <- cel_files[keep_idx, ]
     }
 
     # Append .CEL extension

@@ -58,7 +58,7 @@ SRC_DIR = config.get("src_dir", "")
 METADATA_FILE = os.path.join(DATA_DIR, config.get("metadata_file", ""))
 
 ## Intermediate files
-RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, config.get("raw_data_files", ""))
+RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, config.get("cel_files", ""))
 
 EXP_FILE = os.path.join(PROCESSED_DATA_DIR, config["exp_file"])
 EXP_FILE_BATCH_CORRECTED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_batch_corrected"])

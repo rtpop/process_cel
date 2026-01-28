@@ -20,7 +20,7 @@ run_tag: "matched"
 ## Input files ##
 ## ----------- ##
 metadata_file: "matched_microarray_metadata.csv"
-raw_data_files: "matched_raw_data_files.txt" # text file with list of raw data files (CEL files) to process (one file per line)
+cel_files: "matched_raw_data_files.txt" # text file with list of raw data files (CEL files) to process (one file per line)
 
 ## ----------------- ##
 ## Processing params ##

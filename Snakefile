@@ -60,9 +60,9 @@ METADATA_FILE = os.path.join(DATA_DIR, config.get("metadata_file", ""))
 ## Intermediate files
 RAW_DATA_FILES = os.path.join(RAW_DATA_DIR, config.get("cel_files", ""))
 
-EXP_FILE = os.path.join(PROCESSED_DATA_DIR, config["exp_file"])
-EXP_FILE_BATCH_CORRECTED = os.path.join(PROCESSED_DATA_DIR, config["exp_file_batch_corrected"])
-EXP_FILE_FINAL = os.path.join(PROCESSED_DATA_DIR, config["exp_file_final"])
+EXP_FILE = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file", ""))
+EXP_FILE_BATCH_CORRECTED = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_batch_corrected", ""))
+EXP_FILE_FINAL = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_final", ""))
 
 # pca params
 PCA_PLOT = EXP_FILE.replace(".txt", "_PCA_plot.pdf")

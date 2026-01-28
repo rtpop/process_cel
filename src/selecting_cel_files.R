@@ -19,7 +19,7 @@ opt <- list(
     tumour_metadata_column = snakemake@params[["tumour_metadata_column"]],
     normal_samples = snakemake@params[["normal_samples"]],
     functions_script = snakemake@params[["functions_script"]],
-    output_file = snakemake@output[["output_file"]]
+    output_file = snakemake@output[["raw_data_files"]]
 )
 
 message("DEBUG: opt structure:")

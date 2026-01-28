@@ -12,14 +12,14 @@ options(stringsAsFactors = FALSE)
 ## --------------- ##
 
 opt <- list(
-    snakemake@input[["raw_data_dir"]],
-    snakemake@input[["metadata_file"]],
-    snakemake@params[["file_selection_method"]],
-    snakemake@params[["array_type"]],
-    snakemake@params[["tumour_metadata_column"]],
-    snakemake@params[["normal_samples"]],
-    snakemake@params[["functions_script"]],
-    snakemake@output[["output_file"]]
+    raw_data_dir = snakemake@input[["raw_data_dir"]],
+    metadata_file = snakemake@input[["metadata_file"]],
+    file_selection_method = snakemake@params[["file_selection_method"]],
+    array_type = snakemake@params[["array_type"]],
+    tumour_metadata_column = snakemake@params[["tumour_metadata_column"]],
+    normal_samples = snakemake@params[["normal_samples"]],
+    functions_script = snakemake@params[["functions_script"]],
+    output_file = snakemake@output[["output_file"]]
 )
 
 message("DEBUG: opt structure:")

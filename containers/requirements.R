@@ -15,7 +15,7 @@ install.packages(
 required_packages_bioconductor <- c(
     "affy",             # For processing Affymetrix microarray data
     "pd.hta.2.0",       # For processing Affymetrix microarray data
-    "hta20cdf",         # For processing Affymetrix microarray data
+    "hta20cdf"         # For processing Affymetrix microarray data
 )
 
 BiocManager::install(

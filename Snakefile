@@ -141,6 +141,7 @@ if PROCESS_CEL:
         container: R_CONTAINER
         params:
             script = os.path.join(SRC_DIR, "selecting_cel_files.R"), \
+            functions_script = os.path.join(SRC_DIR, "selecting_cel_files_fn.R"), \
             file_selection_method = FILE_SELECTION_METHOD, \
             array_type = ARRAY_TYPE, \
             tumour_metadata_column = TUMOUR_METADATA_COLUMN, \

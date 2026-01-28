@@ -18,11 +18,12 @@ opt <- list(
     snakemake@params[["array_type"]],
     snakemake@params[["tumour_metadata_column"]],
     snakemake@params[["normal_samples"]],
+    snakemake@params[["functions_script"]],
     snakemake@output[["output_file"]]
 )
 
 ## Source functions
-source("src/selecting_cel_files_fn.R")
+source(opt$functions_script)
 
 select_cel_files(
     raw_data_dir = opt$raw_data_dir,

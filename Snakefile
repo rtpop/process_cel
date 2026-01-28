@@ -73,9 +73,7 @@ N_PROBES = config.get("n_probes", "")
 ## Params
 PROCESS_CEL = config.get("processing_cel", "")
 FILE_SELECTION_METHOD = config.get("file_selection_method", "")
-NORMALISE = config.get("normalise", "")
-BACKGROUND_CORRECTION = config.get("background_correction","")
-NORMALISATION_METHOD = config.get("normalization_method","")
+NORMALISE = config.get("normalise", TRUE)
 BATCH_CORRECTION = config.get("batch_correction","")
 BATCH_METADATA_COLUMN = config.get("batch_metadata_column", "")
 ARRAY_TYPE = config.get("array_type", "")
@@ -167,7 +165,6 @@ if PROCESS_CEL:
         params:
             script = os.path.join(SRC_DIR, "extract_expression_matrix.R"), \
             normalise = NORMALISE, \
-            background_correction = BACKGROUND_CORRECTION, \
             array_type = ARRAY_TYPE, \
             tumour_metadata_column = TUMOUR_METADATA_COLUMN
         shell:
@@ -176,7 +173,6 @@ if PROCESS_CEL:
                 --raw_data_dir {input.raw_data_dir} \
                 --cel_files {input.raw_data_files} \
                 --normalise {params.normalise} \
-                --background {params.background_correction} \
                 --array_type {params.array_type} \
                 --output_file {output.exp_file} \
                 --tumour_metadata_column {params.tumour_metadata_column}

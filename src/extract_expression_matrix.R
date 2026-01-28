@@ -23,7 +23,6 @@ option_list <- list(
     make_option(c("-o", "--output_file"), type="character", help="Path to save output expression matrix"),
     make_option(c("-n", "--normalise"), type="logical", default=FALSE, help="Whether to normalise the data [default %default]"),
     make_option(c("-a", "--array_type"), type="character", help="Type of array (e.g., hta20, huex10)"),
-    make_option(c("-b", "--background"), type="logical", default=TRUE, help="Whether to perform background correction [default %default]"),
     make_option(c("-t", "--tumour_metadata_column"), type="character", help="Column name in the metadata file indicating tumour IDs for averaging")
 )
 
@@ -37,7 +36,6 @@ extract_expression_matrix(cel_files = opt$cel_files,
                            output_file = opt$output_file,
                            raw_data_dir = opt$raw_data_dir,
                            normalise = opt$normalise,
-                           background = opt$background,
                            array_type = opt$array_type,
                            tumour_metadata_column = opt$tumour_metadata_column
                            )

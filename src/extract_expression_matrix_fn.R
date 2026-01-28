@@ -9,7 +9,7 @@
 #' @param array_type A character string specifying the type of array.
 #' @return None. The function saves the expression matrix to the specified output file.
 
-extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, normalise=FALSE, background=TRUE, array_type, tumour_metadata_column, anno_file) {
+extract_expression_matrix <- function(cel_files, output_file, raw_data_dir, normalise=TRUE, background=TRUE, array_type, tumour_metadata_column, anno_file) {
     # read cel files
     files_metadata <- fread(cel_files, stringsAsFactors = FALSE)
     files <- as.vector(files_metadata[[1]])

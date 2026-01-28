@@ -80,6 +80,7 @@ ARRAY_TYPE = config.get("array_type", "")
 AVERAGE_BY_TUMOUR = config.get("average_by_tumour", "")
 TUMOUR_METADATA_COLUMN = config.get("tumour_metadata_column", "")
 EXP_FILE_AVG = os.path.join(PROCESSED_DATA_DIR, config.get("exp_file_avg", "exp_avg_by_tumour.txt"))
+NORMAL_SAMPLES = config.get("normal_samples", False)
 
 MERGE_DATASETS = config.get("compile_datasets", False)
 if MERGE_DATASETS:
@@ -142,7 +143,8 @@ if PROCESS_CEL:
             script = os.path.join(SRC_DIR, "selecting_cel_files.R"), \
             file_selection_method = FILE_SELECTION_METHOD, \
             array_type = ARRAY_TYPE, \
-            tumour_metadata_column = TUMOUR_METADATA_COLUMN
+            tumour_metadata_column = TUMOUR_METADATA_COLUMN, \
+            normal_samples = NORMAL_SAMPLES
         shell:
             """
             Rscript {params.script} \

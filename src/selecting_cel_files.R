@@ -22,6 +22,8 @@ opt <- list(
     snakemake@output[["output_file"]]
 )
 
+str(opt)
+
 ## --------- ##
 ## Functions ##
 ## --------- ##

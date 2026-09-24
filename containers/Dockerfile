@@ -1,4 +1,4 @@
-FROM rtpop/basic-r:0.1
+FROM rtpop/basic-r:1.0
 
 ## ------------ ##
 ## How to build ##
